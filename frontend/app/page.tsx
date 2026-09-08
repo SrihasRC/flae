@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, FileText, Sparkles, Scale } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
@@ -75,141 +75,156 @@ export default function LandingPage() {
       </section>
 
       {/* Feature & Architecture Pillars Section */}
-      <section id="architecture" className="py-16 md:py-24 bg-muted/20 border-t border-border/60">
+      <section id="architecture" className="py-16 md:py-24 bg-[#faf9f5] border-t border-[#e6dfd8]">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <Badge variant="outline" className="text-xs font-mono mb-3">
+            <Badge variant="pill" className="text-xs font-mono mb-3">
               Core Capabilities
             </Badge>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-              Engineered for Auditability, Traceability & Rigor
+            <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-[#141413]">
+              Engineered for Auditability, Traceability &amp; Rigor
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-              Generic LLM summarizers hallucinate when corporate reports disagree. Our engine enforces
-              epistemic bounds before comparing claims.
+            <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
+              Generic LLM summarizers hallucinate when corporate reports disagree. FLAE enforces
+              strict epistemic bounds before comparing claims.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: Fact Extraction */}
-            <Card className="border border-border/80 shadow-xs">
-              <CardHeader className="pb-3">
-                <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center mb-2">
-                  <FileText className="h-4 w-4 text-foreground" />
-                </div>
-                <CardTitle className="text-base font-semibold">Atomic Fact Ledger</CardTitle>
-                <CardDescription className="text-xs">
-                  Immutable claims anchored to exact page citations.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-muted-foreground leading-relaxed">
-                Decomposes PDF filings into discrete, typed claims with numerical normalization, raw
-                strings, units, and verbatim paragraph excerpts for tamper-evident review.
-              </CardContent>
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
+                <FileText className="h-4 w-4 text-[#cc785c]" />
+              </div>
+              <h3 className="text-base font-semibold text-[#141413]">Atomic Fact Ledger</h3>
+              <p className="text-xs text-[#6c6a64] leading-relaxed">
+                Decomposes complex corporate disclosures into discrete, typed claims with numerical
+                normalization, raw strings, units, and verbatim paragraph excerpts.
+              </p>
             </Card>
 
             {/* Card 2: Context Envelope */}
-            <Card className="border border-border/80 shadow-xs">
-              <CardHeader className="pb-3">
-                <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center mb-2">
-                  <Sparkles className="h-4 w-4 text-foreground" />
-                </div>
-                <CardTitle className="text-base font-semibold">6-D Context Envelopes</CardTitle>
-                <CardDescription className="text-xs">
-                  Temporal, organizational, and accounting boundaries.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-muted-foreground leading-relaxed">
-                Prevents false conflicts by tagging temporal period (FY24 vs Q4), accounting rules
-                (Ind-AS reported vs pro-forma), and entity scope (Standalone vs Consolidated).
-              </CardContent>
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
+                <Sparkles className="h-4 w-4 text-[#cc785c]" />
+              </div>
+              <h3 className="text-base font-semibold text-[#141413]">6-D Context Envelopes</h3>
+              <p className="text-xs text-[#6c6a64] leading-relaxed">
+                Prevents false conflicts by explicitly binding claims to temporal periods, statutory
+                accounting rules, and organizational scope (Standalone vs Consolidated).
+              </p>
             </Card>
 
             {/* Card 3: Arbitration Engine */}
-            <Card className="border border-border/80 shadow-xs">
-              <CardHeader className="pb-3">
-                <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center mb-2">
-                  <Scale className="h-4 w-4 text-foreground" />
-                </div>
-                <CardTitle className="text-base font-semibold">Epistemic Arbiter</CardTitle>
-                <CardDescription className="text-xs">
-                  Automated pairwise contradiction resolution.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-xs text-muted-foreground leading-relaxed">
-                Cross-document matching classifies pairs into Corroborated, Contradicted, or
-                Reconciled with comprehensive step-by-step reasoning traces and confidence metrics.
-              </CardContent>
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
+                <Scale className="h-4 w-4 text-[#cc785c]" />
+              </div>
+              <h3 className="text-base font-semibold text-[#141413]">Epistemic Arbiter</h3>
+              <p className="text-xs text-[#6c6a64] leading-relaxed">
+                Pairwise semantic matching classifies claims into Corroborated, Contradicted, or
+                Reconciled with comprehensive step-by-step reasoning traces.
+              </p>
             </Card>
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link
+              href="/docs"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "text-xs font-medium px-4 gap-1.5"
+              )}
+            >
+              <span>Explore Complete Architecture &amp; System Docs</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Epistemic Showcase Section */}
-      <section id="cases" className="py-16 md:py-24 border-t border-border/60">
+      <section id="cases" className="py-16 md:py-24 border-t border-[#e6dfd8] bg-[#f5f0e8]/50">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <Badge variant="outline" className="text-xs font-mono mb-3">
+            <Badge variant="pill" className="text-xs font-mono mb-3">
               Case Study Explorer
             </Badge>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-[#141413]">
               Demonstrated on Delhivery Limited Filings
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+            <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
               Inspect how the engine processes real-world filings including the FY24 Annual Report
               and Q4 FY24 Earnings Presentation.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-xl border border-border/80 bg-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-sm">Case 1 & 2: Corroboration & Contradiction</span>
-                <Badge variant="secondary" className="text-[10px] font-mono">
-                  Direct Verification
+            <Card variant="canvas" className="p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm text-[#141413]">
+                  Case 1 &amp; 2: Corroboration &amp; Contradiction
+                </span>
+                <Badge variant="teal" className="text-[10px] font-mono">
+                  Verified
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-[#6c6a64] leading-relaxed">
                 Identifies claims that corroborate identically across filings (e.g. shipment volume,
                 network scale) and surfaces genuine contradictions (e.g. board member counts or
                 conflicting revisions) with juxtaposed quote excerpts.
               </p>
-            </div>
+            </Card>
 
-            <div className="p-5 rounded-xl border border-border/80 bg-card">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-sm">Case 3: Epistemic Reconciliation</span>
-                <Badge variant="secondary" className="text-[10px] font-mono">
+            <Card variant="canvas" className="p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm text-[#141413]">
+                  Case 3: Epistemic Reconciliation
+                </span>
+                <Badge variant="amber" className="text-[10px] font-mono">
                   Context Aware
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-[#6c6a64] leading-relaxed">
                 Resolves apparent discrepancies such as Standalone Revenue (₹74,540 M) versus
                 Consolidated Revenue (₹81,415 M) by demonstrating that organizational boundary divergence
                 explains the mathematical delta.
               </p>
-            </div>
+            </Card>
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-12 flex items-center justify-center gap-3">
+            <Link
+              href="/cases"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "text-xs font-medium px-4"
+              )}
+            >
+              Read Detailed Case Studies
+            </Link>
             <Link
               href="/workspaces/b097fafc-4e75-442d-8065-b4cee73091b9?tab=arbitration"
               className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-10 px-6 text-xs font-medium inline-flex items-center"
+                buttonVariants({ variant: "coral", size: "sm" }),
+                "text-xs font-medium px-4"
               )}
             >
-              View Arbitration Showcase
+              Open Delhivery Live Console
             </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
+      <footer className="border-t border-[#e6dfd8] py-8 text-center text-xs text-[#6c6a64] bg-[#faf9f5]">
         <div className="container mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>FLAE — Epistemic Knowledge Discovery & Fact Arbitration</span>
-          <span className="font-mono text-[11px]">Next.js 16 • FastAPI • ChromaDB</span>
+          <span className="font-serif text-sm text-[#141413]">
+            FLAE — Epistemic Truth Discovery &amp; Fact Arbitration
+          </span>
+          <span className="font-mono text-[11px] text-[#8e8b82]">
+            Enterprise Dossier Protocol • Deterministic Audit Engine
+          </span>
         </div>
       </footer>
     </div>

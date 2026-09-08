@@ -1,30 +1,22 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { GithubIcon } from "@hugeicons/core-free-icons";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-function GithubIcon({ className = "h-4 w-4" }: { className?: string }) {
+function AnthropicRadialSpike({ className = "h-3.5 w-3.5" }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-      <path d="M9 18c-4.51 2-5-2-7-2" />
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
     </svg>
   );
 }
-
-import { Suspense } from "react";
 
 function NavbarContent() {
   const pathname = usePathname();
@@ -39,7 +31,7 @@ function NavbarContent() {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-6xl transition-all duration-300">
-      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-border/70 bg-background/80 backdrop-blur-md shadow-md">
+      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-[#e6dfd8] bg-[#faf9f5]/90 dark:bg-[#181715]/90 backdrop-blur-md shadow-xs">
         {isWorkspaceDetail ? (
           <>
             {/* Workspace Mode: Left side with Back button */}
@@ -48,18 +40,19 @@ function NavbarContent() {
                 href="/workspaces"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "h-8 px-2.5 text-xs font-medium gap-1.5 text-muted-foreground hover:text-foreground"
+                  "h-8 px-2.5 text-xs font-medium gap-1.5 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 )}
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Workspaces</span>
               </Link>
-              <div className="h-4 w-[1px] bg-border hidden sm:block" />
+              <div className="h-4 w-[1px] bg-[#e6dfd8] hidden sm:block" />
               <div className="hidden sm:flex items-center gap-1.5">
-                <span className="font-semibold text-sm tracking-tight text-foreground">
-                  Workspace Dossier
+                <AnthropicRadialSpike className="h-3 w-3 text-[#cc785c]" />
+                <span className="font-semibold text-xs tracking-tight text-[#141413] dark:text-[#faf9f5]">
+                  Dossier Console
                 </span>
-                <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-mono">
+                <Badge variant="pill" className="text-[10px] py-0 px-1.5 font-mono">
                   Live
                 </Badge>
               </div>
@@ -71,8 +64,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=ledger`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "ledger"
-                    ? "bg-secondary text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Fact Ledger
@@ -81,8 +74,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=arbitration`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "arbitration"
-                    ? "bg-secondary text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Arbitration
@@ -91,8 +84,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=documents`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "documents"
-                    ? "bg-secondary text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Documents
@@ -101,8 +94,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=query`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors hidden sm:inline-block ${
                   currentTab === "query"
-                    ? "bg-secondary text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Query
@@ -112,16 +105,16 @@ function NavbarContent() {
             {/* Workspace Mode: Right side actions */}
             <div className="flex items-center gap-2">
               <a
-                href="https://github.com/SrihasRC/flae"
+                href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Repository"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-8 w-8 text-muted-foreground hover:text-foreground"
+                  "h-8 w-8 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 )}
               >
-                <GithubIcon className="h-4 w-4" />
+                <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={1.5} />
               </a>
             </div>
           </>
@@ -130,20 +123,24 @@ function NavbarContent() {
             {/* Normal Mode: Left side Logo */}
             <div className="flex items-center gap-2.5">
               <Link href="/" className="flex items-center gap-2">
-                <span className="font-extrabold text-sm tracking-tight text-foreground font-mono">
+                <AnthropicRadialSpike className="h-4 w-4 text-[#cc785c]" />
+                <span className="font-extrabold text-sm tracking-tight text-[#141413] dark:text-[#faf9f5] font-mono">
                   FLAE
                 </span>
+                <Badge variant="pill" className="text-[10px] py-0 px-1.5 font-mono">
+                  Enterprise
+                </Badge>
               </Link>
             </div>
 
-            {/* Normal Mode: Center 3-4 links */}
+            {/* Normal Mode: Center 3-4 links leading to separate pages */}
             <nav className="hidden md:flex items-center gap-6">
               <Link
                 href="/"
                 className={`text-xs font-medium transition-colors ${
                   pathname === "/"
-                    ? "text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Overview
@@ -152,28 +149,40 @@ function NavbarContent() {
                 href="/workspaces"
                 className={`text-xs font-medium transition-colors ${
                   pathname.startsWith("/workspaces")
-                    ? "text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 }`}
               >
                 Workspaces
               </Link>
               <Link
-                href="/#architecture"
-                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                href="/docs"
+                className={`text-xs font-medium transition-colors ${
+                  pathname === "/docs"
+                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                }`}
               >
-                Architecture
+                Architecture & Docs
               </Link>
               <Link
-                href="/#cases"
-                className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                href="/cases"
+                className={`text-xs font-medium transition-colors ${
+                  pathname === "/cases"
+                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
+                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                }`}
               >
-                Epistemic Cases
+                Case Studies
               </Link>
             </nav>
 
             {/* Normal Mode: Right side Actions */}
             <div className="flex items-center gap-2.5">
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6c6a64] font-mono">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#5db872]" />
+                <span className="text-[11px]">Audit Engine Active</span>
+              </div>
               <a
                 href="https://github.com"
                 target="_blank"
@@ -181,11 +190,20 @@ function NavbarContent() {
                 aria-label="GitHub Repository"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-8 w-8 text-muted-foreground hover:text-foreground"
+                  "h-8 w-8 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
                 )}
               >
-                <GithubIcon className="h-4 w-4" />
+                <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={1.5} />
               </a>
+              <Link
+                href="/workspaces"
+                className={cn(
+                  buttonVariants({ variant: "coral", size: "sm" }),
+                  "h-8 text-xs font-medium px-3.5 shadow-xs"
+                )}
+              >
+                Launch Console
+              </Link>
             </div>
           </>
         )}
@@ -199,8 +217,8 @@ export function FloatingNavbar() {
     <Suspense
       fallback={
         <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-6xl">
-          <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-border/70 bg-background/80 backdrop-blur-md shadow-md">
-            <span className="font-extrabold text-sm tracking-tight text-foreground font-mono">
+          <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-[#e6dfd8] bg-[#faf9f5]/90 backdrop-blur-md shadow-xs">
+            <span className="font-extrabold text-sm tracking-tight text-[#141413] font-mono">
               FLAE
             </span>
           </div>
