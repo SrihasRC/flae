@@ -30,7 +30,7 @@ function NavbarContent() {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-6xl transition-all duration-300">
-      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-hairline bg-canvas/90 dark:bg-surface-dark/90 backdrop-blur-md shadow-xs">
+      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-primary/15 bg-canvas/25 dark:bg-surface-dark/25 backdrop-blur-md shadow-xs">
         {isWorkspaceDetail ? (
           <>
             {/* Workspace Mode: Left side with Back button */}
