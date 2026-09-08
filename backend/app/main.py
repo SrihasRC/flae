@@ -25,14 +25,14 @@ async def lifespan(app: FastAPI):
     await init_db()
     logger.info("Database tables initialized")
 
-    # 2. Check ChromaDB connectivity (HttpClient or PersistentClient fallback)
+    # 2. Check ChromaDB connectivity
     try:
-        from app.services.vector_store import VectorStoreService
+        from app.dependencies import get_vector_store
 
-        vs = VectorStoreService()
+        vs = get_vector_store()
         vs.client.heartbeat()
         if vs.client_type == "persistent":
-            logger.info(f"ChromaDB ready (PersistentClient at {settings.CHROMA_PERSISTENT_PATH})")
+            logger.info(f"ChromaDB ready (local PersistentClient at {settings.CHROMA_PERSISTENT_PATH})")
         else:
             logger.info(f"ChromaDB connected at {settings.CHROMA_HOST}:{settings.CHROMA_PORT}")
     except Exception as e:
@@ -89,12 +89,13 @@ async def health_check() -> dict[str, Any]:
 
     # ChromaDB check
     try:
-        from app.services.vector_store import VectorStoreService
+        from app.dependencies import get_vector_store
 
-        vs = VectorStoreService()
+        vs = get_vector_store()
         vs.client.heartbeat()
         chroma_status = "connected"
-    except Exception:
+    except Exception as e:
+        logger.warning("ChromaDB health check failed: %s", e)
         chroma_status = "unavailable"
 
     return {

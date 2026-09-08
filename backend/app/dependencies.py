@@ -1,5 +1,7 @@
 """FastAPI dependency providers for repositories and services."""
 
+from typing import Optional
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -45,9 +47,15 @@ def get_embedding_service() -> EmbeddingService:
     return EmbeddingService()
 
 
+_vector_store_instance: Optional[VectorStoreService] = None
+
+
 def get_vector_store() -> VectorStoreService:
-    """Provide a VectorStoreService instance."""
-    return VectorStoreService()
+    """Provide a cached singleton VectorStoreService instance."""
+    global _vector_store_instance
+    if _vector_store_instance is None:
+        _vector_store_instance = VectorStoreService()
+    return _vector_store_instance
 
 
 def get_arbitration_service(

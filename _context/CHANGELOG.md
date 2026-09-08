@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. Sub-agents must prepend new entries following the format below upon task completion.
 
+## [fix/embedded-persistent-chromadb] — 2026-09-08
+
+### Added
+- None
+
+### Modified
+- `backend/app/core/config.py`: Added `CHROMA_MODE: str = "persistent"`, set `CHROMA_PERSISTENT_PATH = "chroma_data"`, and shifted default `CHROMA_PORT` to `8001` to eliminate port 8000 collisions.
+- `backend/app/services/vector_store.py`: Updated `VectorStoreService` to directly instantiate local `chromadb.PersistentClient` when `CHROMA_MODE == "persistent"` without making network requests, only using `chromadb.HttpClient` when `CHROMA_MODE == "http"`. Added class-level client caching (`_cached_client`) to avoid reopening SQLite files unnecessarily.
+- `backend/app/dependencies.py`: Updated `get_vector_store()` to reuse a cached singleton `VectorStoreService` instance.
+- `backend/app/main.py`: Updated application startup `lifespan` and `/health` route to verify ChromaDB using `get_vector_store()` and in-process `heartbeat()`, logging `ChromaDB ready (local PersistentClient at chroma_data)`.
+
+### Notes
+- Resolves the single-threaded uvicorn deadlock where `/health` previously made a blocking HTTP call to port 8000 against its own event loop.
+- Verified cleanly with `uvicorn` on port 8000: `/health` and `/docs` return HTTP 200 immediately with sub-3ms response times.
+
 ---
 
 ## [fix/local-postgres-chroma-setup] — 2026-09-08

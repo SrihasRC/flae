@@ -22,8 +22,9 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql+asyncpg://localhost:5432/fact_ledger"
     GEMINI_API_KEY: str = ""
+    CHROMA_MODE: str = "persistent"
     CHROMA_HOST: str = "localhost"
-    CHROMA_PORT: int = 8000
+    CHROMA_PORT: int = 8001
     CHROMA_COLLECTION_PREFIX: str = "fact_ledger"
     CHROMA_PERSISTENT_PATH: str = "chroma_data"
 
