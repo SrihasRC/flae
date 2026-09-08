@@ -36,6 +36,7 @@ from app.schemas.document import (
 from app.services.arbitration_service import ArbitrationService
 from app.services.embedding_service import EmbeddingService
 from app.services.extraction_service import ExtractionService
+from app.services.local_extraction import LocalExtractionService
 from app.services.pdf_parser import extract_pdf_metadata, parse_pdf
 from app.services.vector_store import VectorStoreService
 
@@ -68,7 +69,7 @@ async def run_ingestion_pipeline(
                 local_doc_repo = DocumentRepository(session)
                 local_fact_repo = FactRepository(session)
                 local_arb_repo = ArbitrationRepository(session)
-                local_extraction_svc = extraction_svc or ExtractionService()
+                local_extraction_svc = extraction_svc or LocalExtractionService()
                 local_embedding_svc = embedding_svc or EmbeddingService()
                 local_vector_store = vector_store or VectorStoreService()
                 local_arbitration_svc = arbitration_svc or ArbitrationService(
@@ -97,6 +98,7 @@ async def run_ingestion_pipeline(
                     workspace_id=workspace_id,
                     visual_pages=visual_pages,
                     file_bytes=file_bytes,
+                    filename=Path(file_path).name,
                 )
                 logger.info(
                     "Fact extraction complete (%d facts) for %s",
@@ -124,19 +126,8 @@ async def run_ingestion_pipeline(
                         },
                     )
 
-                # 6. Run incremental arbitration
-                arb_results = await local_arbitration_svc.run_arbitration_for_workspace(
-                    workspace_id, new_document_id=document_id
-                )
-
-                # 7. Store arbitration results
-                if arb_results:
-                    await local_arb_repo.create_bulk(
-                        [
-                            dict(result) | {"workspace_id": str(workspace_id)}
-                            for result in arb_results
-                        ]
-                    )
+                # 6. Arbitration skipped (LLM quota exhausted — run later via POST /arbitration/run)
+                arb_results: list[dict] = []
 
                 # 8. Update status to complete
                 await local_doc_repo.update_status(
@@ -179,13 +170,14 @@ async def run_ingestion_pipeline(
                 document_id,
             )
 
-            local_ext = extraction_svc or ExtractionService()
+            local_ext = extraction_svc or LocalExtractionService()
             facts = await local_ext.extract_facts(
                 blocks=blocks,
                 document_id=document_id,
                 workspace_id=workspace_id,
                 visual_pages=visual_pages,
                 file_bytes=file_bytes,
+                filename=Path(file_path).name,
             )
             logger.info("Fact extraction complete (%d facts)", len(facts))
 
@@ -208,19 +200,19 @@ async def run_ingestion_pipeline(
                     },
                 )
 
-            local_arb = arbitration_svc or ArbitrationService(
-                local_emb, local_vec, fact_repo
-            )
-            arb_results = await local_arb.run_arbitration_for_workspace(
-                workspace_id, new_document_id=document_id
-            )
-            if arb_results and arb_repo:
-                await arb_repo.create_bulk(
-                    [
-                        dict(result) | {"workspace_id": str(workspace_id)}
-                        for result in arb_results
-                    ]
+            # Arbitration skipped by default (LLM quota exhausted — run later via POST /arbitration/run)
+            arb_results = []
+            if arbitration_svc is not None:
+                arb_results = await arbitration_svc.run_arbitration_for_workspace(
+                    workspace_id, new_document_id=document_id
                 )
+                if arb_results and arb_repo:
+                    await arb_repo.create_bulk(
+                        [
+                            dict(result) | {"workspace_id": str(workspace_id)}
+                            for result in arb_results
+                        ]
+                    )
 
             await doc_repo.update_status(
                 document_id, "complete", facts_extracted=len(facts)
