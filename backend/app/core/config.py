@@ -1,5 +1,5 @@
 from pathlib import Path
-from pydantic import field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _CURRENT_DIR = Path(__file__).resolve().parent
@@ -22,6 +22,14 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql+asyncpg://localhost:5432/fact_ledger"
     GEMINI_API_KEY: str = ""
+    GEMINI_API_KEY_2: str = Field(
+        default="",
+        validation_alias=AliasChoices("GEMINI_API_KEY_2", "GEMINI_API_KEY-2"),
+    )
+    GEMINI_API_KEY_3: str = Field(
+        default="",
+        validation_alias=AliasChoices("GEMINI_API_KEY_3", "GEMINI_API_KEY-3"),
+    )
     CHROMA_MODE: str = "persistent"
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8001
@@ -34,6 +42,21 @@ class Settings(BaseSettings):
         if isinstance(v, str) and v.startswith("postgresql://"):
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
         return v
+
+    @property
+    def gemini_api_keys(self) -> list[str]:
+        """Return configured Gemini keys in priority order without duplicates."""
+        return list(
+            dict.fromkeys(
+                key.strip()
+                for key in (
+                    self.GEMINI_API_KEY,
+                    self.GEMINI_API_KEY_2,
+                    self.GEMINI_API_KEY_3,
+                )
+                if key and key.strip()
+            )
+        )
 
 
 settings = Settings()

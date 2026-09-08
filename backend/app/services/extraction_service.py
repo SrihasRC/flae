@@ -1,5 +1,6 @@
 """LLM-powered Atomic Fact Extraction Service using Gemini structured outputs."""
 
+import asyncio
 import inspect
 import json
 import logging
@@ -12,7 +13,7 @@ from google.genai import types
 from pydantic import BaseModel, Field
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from app.core.config import settings
+from app.core.gemini import GeminiClientPool
 from app.services.pdf_parser import render_page_as_image
 
 logger = logging.getLogger(__name__)
@@ -144,7 +145,7 @@ VISUAL_EXTRACTION_PROMPT = (
     "- value_numeric: numeric float value if parseable, otherwise null\n"
     "- unit: unit of measurement (string, e.g. 'INR Cr', '%', 'USD'), otherwise null\n"
     "- context_envelope: object with temporal_period, period_type, entity_scope, geography, accounting_methodology, additional_qualifiers (all fields optional/null)\n"
-    "- evidence: object with verbatim_quote (the visible text label nearest to the value), page_number (the given page number), section_title (null)\n\n"
+    "- evidence: object with verbatim_quote (an exact visible phrase that includes both the label and value), page_number (the given page number), section_title (null)\n\n"
     "Return ONLY the valid JSON array."
 )
 
@@ -160,7 +161,7 @@ class ExtractionService:
         "Your mission is to extract atomic facts explicitly stated in the provided text blocks.\n\n"
         "Strict Guardrails:\n"
         "1. Extract ONLY facts that are explicitly and directly stated in the text.\n"
-        "2. Require VERBATIM quotes: Every fact must have an exact, verbatim quote in evidence.verbatim_quote from the source text.\n"
+        "2. Require VERBATIM quotes: Every fact must have an exact, verbatim quote in evidence.verbatim_quote from the source text. The quote must include the reported value and enough nearby label/context to identify one physical PDF page.\n"
         "3. Do NOT infer, extrapolate, assume, or hallucinate values, numbers, dates, or scopes.\n"
         "4. For numeric facts, extract the raw representation (value_raw) as well as the normalized numeric float value (value_numeric) and unit where available.\n"
         "5. Accurately populate the context_envelope:\n"
@@ -180,10 +181,10 @@ class ExtractionService:
     ) -> None:
         """Initialize the extraction service with a Gemini client."""
         if client is not None:
-            self.client = client
+            self._client_pool = GeminiClientPool(client=client)
         else:
-            api_key = settings.GEMINI_API_KEY or "dummy-api-key"
-            self.client = genai.Client(api_key=api_key)
+            self._client_pool = GeminiClientPool()
+        self.client = self._client_pool.client
         self.model = model
 
     def _build_batch_prompt(self, batch: list) -> tuple[str, str]:
@@ -234,14 +235,14 @@ class ExtractionService:
     ) -> Any:
         """Invoke Gemini models.generate_content with retry logic."""
         try:
-            return self.client.models.generate_content(
+            return self._client_pool.generate_content(
                 model=self.model,
                 contents=prompt,
                 config=config,
             )
         except TypeError as te:
             if "config" in str(te) or "generation_config" in str(te):
-                return self.client.models.generate_content(
+                return self._client_pool.generate_content(
                     model=self.model,
                     contents=prompt,
                     generation_config=config,
@@ -254,6 +255,7 @@ class ExtractionService:
         page_number: int,
         document_id: Any,
         workspace_id: Any,
+        source_text: str,
     ) -> list[dict]:
         """Extract facts from a page image using Gemini multimodal API."""
         if not image_bytes:
@@ -266,7 +268,7 @@ class ExtractionService:
             image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/png")
             text_part = types.Part.from_text(text=VISUAL_EXTRACTION_PROMPT)
 
-            response = self.client.models.generate_content(
+            response = self._client_pool.generate_content(
                 model=self.model,
                 contents=[image_part, text_part],
                 config=types.GenerateContentConfig(response_mime_type="application/json"),
@@ -321,17 +323,28 @@ class ExtractionService:
                     except (ValueError, TypeError):
                         val_numeric = None
 
-                quote = (
-                    evidence.get("verbatim_quote")
-                    or item.get("attribute")
-                    or item.get("value_raw")
-                    or ""
-                )
+                quote = str(evidence.get("verbatim_quote", ""))
+                if not validate_quote(quote, source_text):
+                    continue
+
+                try:
+                    validated = ExtractedFact.model_validate(item)
+                except Exception as exc:
+                    logger.warning(
+                        "Visual extraction validation failure (Case 4) on page %d: %s",
+                        page_number,
+                        exc,
+                    )
+                    continue
+
+                if not validated.subject.strip() or not validated.attribute.strip() or not validated.value_raw.strip():
+                    logger.warning("Visual extraction returned an incomplete fact (Case 4) on page %d", page_number)
+                    continue
 
                 fact_dict: dict[str, Any] = {
-                    "subject": str(item.get("subject", "")),
-                    "attribute": str(item.get("attribute", "")),
-                    "value_raw": str(item.get("value_raw", "")),
+                    "subject": validated.subject,
+                    "attribute": validated.attribute,
+                    "value_raw": validated.value_raw,
                     "value_numeric": val_numeric,
                     "unit": item.get("unit"),
                     "context_envelope": {
@@ -374,6 +387,45 @@ class ExtractionService:
             )
             return []
 
+    @staticmethod
+    def _source_text_by_page(blocks: list) -> dict[int, str]:
+        """Return the extractable source text for each physical PDF page."""
+        source_by_page: dict[int, list[str]] = {}
+        for block in blocks:
+            page_number = (
+                block.get("page_number", 1)
+                if isinstance(block, dict)
+                else getattr(block, "page_number", 1)
+            )
+            content = (
+                block.get("content", "")
+                if isinstance(block, dict)
+                else getattr(block, "content", "")
+            )
+            raw_markdown = (
+                block.get("raw_markdown", "")
+                if isinstance(block, dict)
+                else getattr(block, "raw_markdown", "")
+            )
+            source_by_page.setdefault(int(page_number), []).extend(
+                str(text) for text in (content, raw_markdown) if text
+            )
+        return {page: "\n".join(parts) for page, parts in source_by_page.items()}
+
+    @staticmethod
+    def _find_grounding_page(quote: str, source_by_page: dict[int, str]) -> int | None:
+        """Find the one physical PDF page that contains a quoted source passage."""
+        matching_pages = [
+            page for page, source_text in source_by_page.items() if validate_quote(quote, source_text)
+        ]
+        if len(matching_pages) != 1:
+            logger.warning(
+                "Quote provenance failure (Case 4): quote matched %d pages; dropping fact",
+                len(matching_pages),
+            )
+            return None
+        return matching_pages[0]
+
     async def extract_facts(
         self,
         blocks: list | tuple,
@@ -403,6 +455,7 @@ class ExtractionService:
         doc_id_str = str(document_id)
         ws_id_str = str(workspace_id)
         all_validated_facts: list[dict] = []
+        source_by_page = self._source_text_by_page(list(blocks or []))
 
         visual_set = set(visual_pages) if visual_pages else set()
 
@@ -417,6 +470,7 @@ class ExtractionService:
                             page_number=page_num,
                             document_id=doc_id_str,
                             workspace_id=ws_id_str,
+                            source_text=source_by_page.get(page_num, ""),
                         )
                         all_validated_facts.extend(visual_facts)
                 except Exception as exc:
@@ -459,7 +513,7 @@ class ExtractionService:
             )
 
             try:
-                response = self._call_gemini_generate(prompt, config)
+                response = await asyncio.to_thread(self._call_gemini_generate, prompt, config)
                 if inspect.isawaitable(response):
                     response = await response
             except Exception as exc:
@@ -533,7 +587,17 @@ class ExtractionService:
                     evidence = {}
                 quote = str(evidence.get("verbatim_quote", ""))
 
-                if not validate_quote(quote, batch_source_text):
+                grounding_page = self._find_grounding_page(quote, source_by_page)
+                if grounding_page is None:
+                    continue
+
+                try:
+                    validated = ExtractedFact.model_validate(item)
+                except Exception as exc:
+                    logger.warning("Extraction validation failure (Case 4): %s", exc)
+                    continue
+                if not validated.subject.strip() or not validated.attribute.strip() or not validated.value_raw.strip():
+                    logger.warning("Extraction returned an incomplete fact (Case 4)")
                     continue
 
                 context_env = item.get("context_envelope") or {}
@@ -547,16 +611,10 @@ class ExtractionService:
                     except (ValueError, TypeError):
                         val_numeric = None
 
-                page_num = evidence.get("page_number", 1)
-                try:
-                    page_num = int(page_num)
-                except (ValueError, TypeError):
-                    page_num = 1
-
                 fact_dict: dict[str, Any] = {
-                    "subject": str(item.get("subject", "")),
-                    "attribute": str(item.get("attribute", "")),
-                    "value_raw": str(item.get("value_raw", "")),
+                    "subject": validated.subject,
+                    "attribute": validated.attribute,
+                    "value_raw": validated.value_raw,
                     "value_numeric": val_numeric,
                     "unit": item.get("unit"),
                     "context_envelope": {
@@ -573,7 +631,7 @@ class ExtractionService:
                     },
                     "evidence": {
                         "verbatim_quote": quote,
-                        "page_number": page_num,
+                        "page_number": grounding_page,
                         "section_title": evidence.get("section_title"),
                     },
                     "document_id": doc_id_str,

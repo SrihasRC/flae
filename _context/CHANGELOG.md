@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here. Sub-agents must prepend new entries following the format below upon task completion.
 
+## [fix/dataset-provenance-audit] — 2026-09-08
+
+### Added
+- `backend/tests/test_extraction_provenance.py`: Regression coverage ensuring that extracted facts use the source's physical page and reject ambiguous quotes.
+- `backend/tests/test_pdf_parser_classification.py`: Regression coverage for bold KPI text, decimal callouts, and explicit source-note classification.
+- `backend/app/core/gemini.py`: Shared Gemini client pool that rotates to configured backup keys after transient quota/service errors.
+- `backend/tests/test_gemini_client_pool.py`: Regression coverage for quota-error rotation and non-rotation on invalid requests.
+
+### Modified
+- `backend/app/services/pdf_parser.py`: Prevented Markdown bold markers and decimal KPI values from being misclassified as footnotes.
+- `backend/app/services/extraction_service.py`: Validates LLM output against the fact schema, derives the evidence page from the uniquely matched source page, grounds visual extraction output in extractable page text, and moves blocking text-generation calls off the async event loop.
+- `backend/app/core/config.py`: Supports `GEMINI_API_KEY_2` / `GEMINI_API_KEY_3` and the compatible hyphenated aliases for backup-key configuration.
+- `backend/app/services/arbitration_service.py` and `backend/app/services/embedding_service.py`: Use the shared backup-key rotation for Gemini calls.
+
+### Notes
+- The Q4 FY24 earnings presentation exposed the original parser issue: bold KPI callouts such as `1.4 Mn Tons` were labeled as footnotes. After the fix, its parsing distribution is 32 callouts, 19 footnotes, 108 text blocks, and 21 tables.
+- Any quote that appears on zero or multiple physical pages is now treated as an auditable Case 4 extraction failure instead of producing an unreliable citation.
+- Backup keys are used only for 408, 429, and 5xx-style transient failures; malformed requests and invalid-key errors still fail immediately. Keys from separate Gemini projects provide independent quota capacity; same-project keys provide failover only.
+
+---
+
 ## [fix/embedded-persistent-chromadb] — 2026-09-08
 
 ### Added
@@ -241,4 +262,3 @@ All notable changes to this project are documented here. Sub-agents must prepend
 - Architecture designed for strict parallel safety: 9 tasks across 5 tiers with zero file ownership conflicts.
 - `main.py` is locked to TASK-09 only; no other agent may modify it.
 - Frontend agents may begin building against `API_BLUEPRINT.md` immediately.
-

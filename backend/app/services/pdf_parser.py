@@ -29,7 +29,7 @@ class ParsedBlock:
 
 # Regex for detecting footnote prefixes
 FOOTNOTE_PREFIX_REGEX = re.compile(
-    r"^(\s*[_*~`]*\s*)([\*†‡§#]+|\([0-9a-zA-Z]{1,2}\)|\[[0-9a-zA-Z]{1,2}\]|[0-9]{1,2}[\.\/]|<sup>[\*†#0-9a-zA-Z]+</sup>|notes?:|sources?:)",
+    r"^(\s*)([†‡§#]+|\([0-9a-zA-Z]{1,2}\)|\[[0-9a-zA-Z]{1,2}\]|[0-9]{1,2}[\.\/](?=\s)|<sup>[†‡#0-9a-zA-Z]+</sup>|notes?:|sources?:)",
     re.IGNORECASE,
 )
 
@@ -110,9 +110,19 @@ def _is_markdown_table(text: str) -> bool:
     return False
 
 
+def _strip_outer_markdown_emphasis(text: str) -> str:
+    """Remove leading Markdown emphasis before classifying a content block."""
+    clean = text.strip()
+    while clean.startswith(("**", "__")):
+        clean = clean[2:].lstrip()
+    if clean.startswith("_("):
+        clean = clean[1:]
+    return clean
+
+
 def _is_footnote_block(text: str, chunk_idx: int, total_chunks: int, prev_block_type: str = "") -> bool:
     """Check if a block represents a footnote or citation."""
-    clean = text.strip()
+    clean = _strip_outer_markdown_emphasis(text)
     if clean.startswith("#"):
         return False
     match = FOOTNOTE_PREFIX_REGEX.match(clean)
@@ -208,7 +218,7 @@ def _is_table_already_captured(table_rows: list[list[str | None]], existing_bloc
 
 def _extract_footnote_marker_and_text(footnote_text: str) -> tuple[str, str] | None:
     """Extract footnote marker and following body text."""
-    clean = footnote_text.strip()
+    clean = _strip_outer_markdown_emphasis(footnote_text)
     m = FOOTNOTE_PREFIX_REGEX.match(clean)
     if m:
         marker = m.group(2).strip()

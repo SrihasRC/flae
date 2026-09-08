@@ -8,6 +8,7 @@ from typing import Generator
 
 from fastembed import TextEmbedding
 from app.core.config import settings
+from app.core.gemini import GeminiClientPool
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +36,8 @@ class EmbeddingService:
             self._model = TextEmbedding(model_name=model_name)
             logger.info("fastembed model loaded (ONNX CPU inference)")
         else:
-            from google import genai
-            gemini_key = api_key or settings.GEMINI_API_KEY or "placeholder_key"
-            self._gemini_client = genai.Client(api_key=gemini_key)
+            keys = [api_key] if api_key else None
+            self._gemini_client = GeminiClientPool(api_keys=keys)
             self._gemini_model = model or "gemini-embedding-2"
             logger.info("Using Gemini embedding API")
 
@@ -75,7 +75,7 @@ class EmbeddingService:
         for i in range(0, len(anchors), _BATCH_SIZE):
             batch = anchors[i : i + _BATCH_SIZE]
             for anchor in batch:
-                response = self._gemini_client.models.embed_content(
+                response = self._gemini_client.embed_content(
                     model=self._gemini_model, contents=anchor
                 )
                 if hasattr(response, "embeddings") and response.embeddings:

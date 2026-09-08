@@ -12,7 +12,7 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
 
-from app.core.config import settings
+from app.core.gemini import GeminiClientPool
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_store import VectorStoreService
 
@@ -128,10 +128,10 @@ class ArbitrationService:
             model: Optional model identifier (defaults to gemini-3.8-flash).
         """
         if client is not None:
-            self.client = client
+            self._client_pool = GeminiClientPool(client=client)
         else:
-            api_key = settings.GEMINI_API_KEY or "dummy-api-key"
-            self.client = genai.Client(api_key=api_key)
+            self._client_pool = GeminiClientPool()
+        self.client = self._client_pool.client
         self.model = model or "gemini-3.8-flash"
         self.embedding_svc = embedding_service
         self.vector_store = vector_store
@@ -144,14 +144,14 @@ class ArbitrationService:
     ) -> Any:
         """Invoke Gemini models.generate_content synchronously."""
         try:
-            return self.client.models.generate_content(
+            return self._client_pool.generate_content(
                 model=self.model,
                 contents=prompt,
                 config=config,
             )
         except TypeError as te:
             if "config" in str(te) or "generation_config" in str(te):
-                return self.client.models.generate_content(
+                return self._client_pool.generate_content(
                     model=self.model,
                     contents=prompt,
                     generation_config=config,
