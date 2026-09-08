@@ -4,6 +4,31 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [TASK-08] — 2026-09-08
+
+### Added
+- `backend/app/dependencies.py`: FastAPI dependency injection providers for repositories (`WorkspaceRepository`, `DocumentRepository`, `FactRepository`, `ArbitrationRepository`) and services (`ExtractionService`, `EmbeddingService`, `VectorStoreService`, `ArbitrationService`).
+- `backend/app/api/__init__.py`: Package initialization marker.
+- `backend/app/api/v1/__init__.py`: Package initialization marker for API v1.
+- `backend/app/api/v1/endpoints/__init__.py`: Package initialization marker for API v1 endpoints.
+- `backend/app/api/v1/endpoints/workspaces.py`: Workspace CRUD endpoints (`POST /`, `GET /`, `GET /{workspace_id}`, `DELETE /{workspace_id}`) with document counting and vector collection deletion.
+- `backend/app/api/v1/endpoints/documents.py`: Document upload (`POST /{workspace_id}/documents`), list (`GET /{workspace_id}/documents`), status polling (`GET /{workspace_id}/documents/{document_id}/status`), and deletion (`DELETE /{workspace_id}/documents/{document_id}`), with asynchronous background ingestion pipeline (`run_ingestion_pipeline`) isolated in independent DB sessions.
+- `backend/app/api/v1/endpoints/facts.py`: Fact ledger query endpoints (`GET /{workspace_id}/facts`, `GET /{workspace_id}/facts/{fact_id}`) with pagination and filtering by document, subject, and attribute.
+- `backend/app/api/v1/endpoints/arbitration.py`: Arbitration execution trigger (`POST /{workspace_id}/arbitration/run`), Case 1-4 Explorer (`GET /{workspace_id}/arbitration/cases`), result listing with filters (`GET /{workspace_id}/arbitration`), and detail retrieval (`GET /{workspace_id}/arbitration/{arbitration_id}`).
+- `backend/app/api/v1/router.py`: Centralized v1 router consolidating workspace, document, fact, and arbitration endpoint routers with unified `/workspaces` prefix mapping.
+
+### Modified
+- None
+
+### Notes
+- Background ingestion pipeline (`run_ingestion_pipeline`) creates dedicated database sessions using `AsyncSessionLocal` to prevent `IllegalStateChangeError` after HTTP response lifecycle completion.
+- Pipeline updates status stage-by-stage (`pending` -> `processing` -> `complete` | `failed`), commits status changes immediately, and catches all errors to store traceback summaries in document records.
+- `/cases` route in arbitration endpoints is deliberately ordered before `/{arbitration_id}` to prevent FastAPI route evaluation collisions.
+- Workspace endpoints accurately query `count_by_workspace` from `DocumentRepository` for live document totals.
+- Uploads are saved under `backend/uploads/{workspace_id}/{filename}` with automated folder creation, 50MB size guardrails, and PDF content type validation.
+
+---
+
 ## [TASK-07] — 2026-09-08
 
 ### Added
