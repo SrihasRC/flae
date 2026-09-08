@@ -1,7 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Search, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  X,
+  Layers,
+  Star,
+  BarChart3,
+  Truck,
+  Users,
+} from "lucide-react";
 import { DocumentRead, FactRead } from "@/lib/types";
 import { listFacts } from "@/lib/api";
 import { Input } from "@/components/ui/input";
@@ -27,16 +38,17 @@ interface FactLedgerTableProps {
 interface CategoryPreset {
   id: string;
   label: string;
+  icon: React.ComponentType<{ className?: string }>;
   query: string;
   description: string;
 }
 
 const CATEGORY_PRESETS: CategoryPreset[] = [
-  { id: "all", label: "All Facts", query: "", description: "Full immutable atomic audit ledger" },
-  { id: "headline", label: "⭐️ Headline KPIs", query: "Revenue, EBITDA, Volume, Center, Margin, Profit", description: "Core executive financial & operational KPIs" },
-  { id: "financials", label: "📊 Financials", query: "Revenue, EBITDA, Profit, Margin, Loss, Income, Debt, Cash", description: "P&L, Margins, Cash Flow & Balance Sheet metrics" },
-  { id: "operations", label: "🚚 Operations", query: "Volume, Parcel, Express, Pincode, Center, Hub, Fleet", description: "Logistics network, freight volumes, and reach" },
-  { id: "governance", label: "👥 Governance", query: "ESOP, Option, Director, Board, Remuneration", description: "Share schemes, board leadership, and statutory appointments" },
+  { id: "all", label: "All Facts", icon: Layers, query: "", description: "Full immutable atomic audit ledger" },
+  { id: "headline", label: "Headline KPIs", icon: Star, query: "Revenue, EBITDA, Volume, Center, Margin, Profit", description: "Core executive financial & operational KPIs" },
+  { id: "financials", label: "Financials", icon: BarChart3, query: "Revenue, EBITDA, Profit, Margin, Loss, Income, Debt, Cash", description: "P&L, Margins, Cash Flow & Balance Sheet metrics" },
+  { id: "operations", label: "Operations", icon: Truck, query: "Volume, Parcel, Express, Pincode, Center, Hub, Fleet", description: "Logistics network, freight volumes, and reach" },
+  { id: "governance", label: "Governance", icon: Users, query: "ESOP, Option, Director, Board, Remuneration", description: "Share schemes, board leadership, and statutory appointments" },
 ];
 
 export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps) {
@@ -116,6 +128,7 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
         <div className="flex flex-wrap items-center gap-1.5">
           {CATEGORY_PRESETS.map((preset) => {
             const isActive = activeCategory === preset.id && !activeSearch;
+            const Icon = preset.icon;
             return (
               <button
                 key={preset.id}
@@ -128,6 +141,7 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
                     : "bg-surface-card hover:bg-surface-soft border-hairline text-muted-claude hover:text-ink"
                 )}
               >
+                <Icon className={cn("h-3.5 w-3.5", isActive ? "text-canvas" : "text-muted-claude")} />
                 <span>{preset.label}</span>
               </button>
             );
@@ -291,8 +305,9 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
                             {cat.label}
                           </span>
                           {cat.isHeadline && (
-                            <span className="text-[9px] font-mono font-semibold text-coral px-1 py-0.2 rounded-xs bg-coral/10 border border-coral/30">
-                              ★ KPI
+                            <span className="text-[9px] font-mono font-semibold text-coral px-1 py-0.2 rounded-xs bg-coral/10 border border-coral/30 flex items-center gap-0.5">
+                              <Star className="h-2.5 w-2.5 fill-coral text-coral" />
+                              <span>KPI</span>
                             </span>
                           )}
                         </div>

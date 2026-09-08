@@ -17,7 +17,7 @@ import {
   formatEvidenceQuote,
   getFactCategory,
 } from "@/lib/formatters";
-import { ChevronDown, ChevronRight, Copy, Check } from "lucide-react";
+import { ChevronDown, ChevronRight, Copy, Check, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -61,8 +61,9 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
               {cat.label}
             </span>
             {cat.isHeadline && (
-              <span className="text-[10px] font-mono font-bold text-coral px-1.5 py-0.5 rounded-xs bg-coral/10 border border-coral/30">
-                ★ Headline KPI
+              <span className="text-[10px] font-mono font-bold text-coral px-1.5 py-0.5 rounded-xs bg-coral/10 border border-coral/30 flex items-center gap-1">
+                <Star className="h-3 w-3 fill-coral text-coral" />
+                <span>Headline KPI</span>
               </span>
             )}
             <Badge variant="pill" className="text-[10px] font-mono">
@@ -89,13 +90,13 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
             {cleanAttr}
           </DialogTitle>
 
-          <DialogDescription className="text-xs text-muted-claude space-y-1">
-            <div>
+          <DialogDescription className="text-xs text-muted-claude space-y-1 block">
+            <span className="block">
               Entity Subject: <strong className="text-ink">{cleanText(fact.subject)}</strong>
-            </div>
-            <div className="text-[11px] text-body">
+            </span>
+            <span className="block text-[11px] text-body">
               Domain Scope: <span className="font-medium text-ink">{cat.definition}</span>
-            </div>
+            </span>
           </DialogDescription>
         </DialogHeader>
 
