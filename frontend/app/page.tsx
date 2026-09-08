@@ -169,7 +169,10 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Pillar 1: Epistemic Knowledge Claim */}
-            <Card variant="cream" className="p-6">
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <FileText className="h-4 w-4 text-coral" />
+              </div>
               <h3 className="text-base font-semibold text-ink font-serif">1. Epistemic Knowledge</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 Handles the philosophy of <em>how we know what is true</em>. Instead of treating text as absolute
@@ -178,7 +181,10 @@ export default function LandingPage() {
             </Card>
 
             {/* Pillar 2: Fact-Ledger */}
-            <Card variant="cream" className="p-6">
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <Sparkles className="h-4 w-4 text-coral" />
+              </div>
               <h3 className="text-base font-semibold text-ink font-serif">2. Fact-Ledger</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 A single, append-only, structured ledger that acts as the global source of truth. Every claim
@@ -187,7 +193,10 @@ export default function LandingPage() {
             </Card>
 
             {/* Pillar 3: Arbiter Agent */}
-            <Card variant="cream" className="p-6">
+            <Card variant="cream" className="p-6 space-y-2.5">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <Scale className="h-4 w-4 text-coral" />
+              </div>
               <h3 className="text-base font-semibold text-ink font-serif">3. The Arbiter Agent</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 A deterministic LLM-as-a-Judge role acting as judge, jury, and classifier. It performs multi-attribute

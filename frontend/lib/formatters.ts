@@ -157,3 +157,53 @@ export function formatEvidenceQuote(quote: string | null | undefined): string {
 
   return q || "No verbatim citation recorded.";
 }
+
+export interface FactCategoryInfo {
+  label: string;
+  badgeVariant: "teal" | "coral" | "amber" | "outline";
+  isHeadline: boolean;
+  definition: string;
+}
+
+/**
+ * Classifies extracted fact into standard business domain categories with salience tagging.
+ */
+export function getFactCategory(
+  attribute: string,
+  subject: string,
+  unit?: string | null
+): FactCategoryInfo {
+  const text = `${attribute} ${subject} ${unit || ""}`.toLowerCase();
+  const isHeadline = /revenue|ebitda|margin|volume|centers?|net profit|pat\b|pbt\b/.test(text);
+
+  if (/revenue|ebitda|profit|loss|margin|expense|income|cash|debt|ind-as|turnover|pat\b|pbt\b|capex|dividend/.test(text)) {
+    return {
+      label: "Financials",
+      badgeVariant: "teal",
+      isHeadline,
+      definition: "Financial Statement disclosure & statutory earnings metrics.",
+    };
+  }
+  if (/volume|parcel|express|pincode|pin-code|center|hub|facility|fleet|freight|ton|tonnes|sq\s*ft|network|client|customer|shipment/.test(text)) {
+    return {
+      label: "Operations",
+      badgeVariant: "coral",
+      isHeadline,
+      definition: "Operational logistics footprint, processing hubs & commercial network scale.",
+    };
+  }
+  if (/director|esop|option|personnel|officer|managerial|remuneration|salary|board|governance|auditor|committee/.test(text)) {
+    return {
+      label: "Governance",
+      badgeVariant: "amber",
+      isHeadline,
+      definition: "Corporate governance, executive appointments & equity incentive schemes.",
+    };
+  }
+  return {
+    label: "Statutory Disclosures",
+    badgeVariant: "outline",
+    isHeadline,
+    definition: "Regulatory filings, statutory compliance statements & audit annotations.",
+  };
+}

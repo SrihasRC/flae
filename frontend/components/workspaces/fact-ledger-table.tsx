@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cleanText, formatAttribute, formatValue } from "@/lib/formatters";
+import { cleanText, formatAttribute, formatValue, getFactCategory } from "@/lib/formatters";
 import { FactDetailModal } from "./fact-detail-modal";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +24,21 @@ interface FactLedgerTableProps {
   documents: DocumentRead[];
 }
 
+interface CategoryPreset {
+  id: string;
+  label: string;
+  query: string;
+  description: string;
+}
+
+const CATEGORY_PRESETS: CategoryPreset[] = [
+  { id: "all", label: "All Facts", query: "", description: "Full immutable atomic audit ledger" },
+  { id: "headline", label: "⭐️ Headline KPIs", query: "Revenue, EBITDA, Volume, Center, Margin, Profit", description: "Core executive financial & operational KPIs" },
+  { id: "financials", label: "📊 Financials", query: "Revenue, EBITDA, Profit, Margin, Loss, Income, Debt, Cash", description: "P&L, Margins, Cash Flow & Balance Sheet metrics" },
+  { id: "operations", label: "🚚 Operations", query: "Volume, Parcel, Express, Pincode, Center, Hub, Fleet", description: "Logistics network, freight volumes, and reach" },
+  { id: "governance", label: "👥 Governance", query: "ESOP, Option, Director, Board, Remuneration", description: "Share schemes, board leadership, and statutory appointments" },
+];
+
 export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps) {
   const [facts, setFacts] = useState<FactRead[]>([]);
   const [total, setTotal] = useState(0);
@@ -31,6 +46,7 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
   const [error, setError] = useState<string | null>(null);
 
   // Filters & pagination
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchInput, setSearchInput] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
   const [selectedDocId, setSelectedDocId] = useState<string>("");
@@ -41,11 +57,14 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
   const [selectedFact, setSelectedFact] = useState<FactRead | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
+  const selectedPreset = CATEGORY_PRESETS.find((p) => p.id === activeCategory);
+  const effectiveQuery = activeSearch.trim() || (selectedPreset?.query || "");
+
   useEffect(() => {
     let active = true;
     listFacts(workspaceId, {
       document_id: selectedDocId || undefined,
-      query: activeSearch.trim() || undefined,
+      query: effectiveQuery || undefined,
       skip: page * limit,
       limit,
     })
@@ -65,7 +84,15 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
     return () => {
       active = false;
     };
-  }, [workspaceId, selectedDocId, page, activeSearch]);
+  }, [workspaceId, selectedDocId, page, effectiveQuery]);
+
+  const handleCategorySelect = (catId: string) => {
+    setActiveCategory(catId);
+    setSearchInput("");
+    setActiveSearch("");
+    setPage(0);
+    setLoading(true);
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +111,36 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
 
   return (
     <div className="space-y-4">
+      {/* Category Pills & Headline KPI Filter Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-0.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          {CATEGORY_PRESETS.map((preset) => {
+            const isActive = activeCategory === preset.id && !activeSearch;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => handleCategorySelect(preset.id)}
+                className={cn(
+                  "text-xs px-2.5 py-1 rounded-sm border transition-all font-medium flex items-center gap-1.5",
+                  isActive
+                    ? "bg-ink text-canvas border-ink shadow-xs"
+                    : "bg-surface-card hover:bg-surface-soft border-hairline text-muted-claude hover:text-ink"
+                )}
+              >
+                <span>{preset.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {activeCategory !== "all" && !activeSearch && (
+          <span className="text-[11px] text-muted-claude font-mono">
+            Filtered by: <span className="font-semibold text-ink">{selectedPreset?.label}</span>
+          </span>
+        )}
+      </div>
+
       {/* Top filter toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-card p-3 rounded-sm border border-hairline shadow-xs">
         <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-2">
@@ -115,12 +172,15 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
           <Button type="submit" size="sm" variant="secondary" className="h-8 text-xs font-medium px-3 rounded-sm border border-hairline">
             Search
           </Button>
-          {activeSearch && (
+          {(activeSearch || activeCategory !== "all") && (
             <Button
               type="button"
               size="sm"
               variant="ghost"
-              onClick={handleClearSearch}
+              onClick={() => {
+                handleClearSearch();
+                setActiveCategory("all");
+              }}
               className="h-8 text-xs font-medium px-2 text-muted-claude hover:text-ink rounded-sm"
             >
               Reset
@@ -158,11 +218,15 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
           <Badge variant="outline" className="text-[10px] font-mono rounded-xs">
             {total.toLocaleString()} facts
           </Badge>
-          {activeSearch && (
+          {activeSearch ? (
             <span className="text-[11px] text-muted-claude">
               matching &quot;{activeSearch}&quot;
             </span>
-          )}
+          ) : activeCategory !== "all" ? (
+            <span className="text-[11px] text-muted-claude">
+              ({selectedPreset?.description})
+            </span>
+          ) : null}
         </div>
         <span className="text-[11px] text-muted-claude font-mono">
           Showing {total === 0 ? 0 : page * limit + 1}–{Math.min((page + 1) * limit, total)} of {total}
@@ -199,23 +263,43 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
                 {facts.map((fact) => {
                   const cleanSubj = cleanText(fact.subject);
                   const cleanAttr = formatAttribute(fact.attribute);
-                  const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);                    return (
-                      <TableRow
-                        key={fact.fact_id}
-                        className="cursor-pointer hover:bg-surface-soft/50 transition-colors border-b border-hairline/60"
-                        onClick={() => {
-                          setSelectedFact(fact);
-                          setDetailOpen(true);
-                        }}
-                      >
-                        <TableCell className="w-[18%] max-w-0 font-medium text-xs text-ink truncate" title={cleanSubj}>
-                          {cleanSubj}
-                        </TableCell>
-                        <TableCell className="w-[32%] max-w-0 text-xs text-muted-claude whitespace-normal overflow-hidden">
-                          <span className="line-clamp-2 break-words font-medium text-ink leading-snug" title={cleanAttr}>
-                            {cleanAttr}
+                  const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);
+                  const cat = getFactCategory(fact.attribute, fact.subject, fact.unit);
+                  return (
+                    <TableRow
+                      key={fact.fact_id}
+                      className="cursor-pointer hover:bg-surface-soft/50 transition-colors border-b border-hairline/60"
+                      onClick={() => {
+                        setSelectedFact(fact);
+                        setDetailOpen(true);
+                      }}
+                    >
+                      <TableCell className="w-[18%] max-w-0 font-medium text-xs text-ink truncate" title={cleanSubj}>
+                        {cleanSubj}
+                      </TableCell>
+                      <TableCell className="w-[32%] max-w-0 text-xs text-muted-claude whitespace-normal overflow-hidden">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span
+                            className={cn(
+                              "text-[9px] font-mono px-1.5 py-0.2 rounded-xs border uppercase tracking-wide font-medium",
+                              cat.badgeVariant === "teal" && "bg-accent-teal/10 text-accent-teal border-accent-teal/30",
+                              cat.badgeVariant === "coral" && "bg-coral/10 text-coral border-coral/30",
+                              cat.badgeVariant === "amber" && "bg-accent-amber/10 text-accent-amber border-accent-amber/30",
+                              cat.badgeVariant === "outline" && "bg-surface-soft text-muted-claude border-hairline"
+                            )}
+                          >
+                            {cat.label}
                           </span>
-                        </TableCell>
+                          {cat.isHeadline && (
+                            <span className="text-[9px] font-mono font-semibold text-coral px-1 py-0.2 rounded-xs bg-coral/10 border border-coral/30">
+                              ★ KPI
+                            </span>
+                          )}
+                        </div>
+                        <span className="line-clamp-2 break-words font-medium text-ink leading-snug" title={cleanAttr}>
+                          {cleanAttr}
+                        </span>
+                      </TableCell>
                         <TableCell className="w-[22%] max-w-0 text-xs whitespace-normal overflow-hidden">
                           <div className="space-y-0.5 max-w-full overflow-hidden">
                             <span

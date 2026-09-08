@@ -15,6 +15,7 @@ import {
   formatAttribute,
   formatValue,
   formatEvidenceQuote,
+  getFactCategory,
 } from "@/lib/formatters";
 import { ChevronDown, ChevronRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
   const cleanAttr = formatAttribute(fact.attribute);
   const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);
   const cleanQuote = formatEvidenceQuote(fact.evidence?.verbatim_quote);
+  const cat = getFactCategory(fact.attribute, fact.subject, fact.unit);
 
   const handleCopyJson = () => {
     navigator.clipboard.writeText(JSON.stringify(fact, null, 2));
@@ -47,6 +49,22 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
       <DialogContent className="sm:max-w-2xl w-[95vw] sm:w-full max-h-[88vh] overflow-y-auto overflow-x-hidden p-6 space-y-5 bg-canvas border border-hairline shadow-lg">
         <DialogHeader className="space-y-2 border-b border-hairline pb-4 text-left">
           <div className="flex flex-wrap items-center gap-1.5">
+            <span
+              className={cn(
+                "text-[10px] font-mono px-2 py-0.5 rounded-xs border uppercase tracking-wider font-semibold",
+                cat.badgeVariant === "teal" && "bg-accent-teal/10 text-accent-teal border-accent-teal/30",
+                cat.badgeVariant === "coral" && "bg-coral/10 text-coral border-coral/30",
+                cat.badgeVariant === "amber" && "bg-accent-amber/10 text-accent-amber border-accent-amber/30",
+                cat.badgeVariant === "outline" && "bg-surface-soft text-muted-claude border-hairline"
+              )}
+            >
+              {cat.label}
+            </span>
+            {cat.isHeadline && (
+              <span className="text-[10px] font-mono font-bold text-coral px-1.5 py-0.5 rounded-xs bg-coral/10 border border-coral/30">
+                ★ Headline KPI
+              </span>
+            )}
             <Badge variant="pill" className="text-[10px] font-mono">
               ID: {fact.fact_id.slice(0, 8)}
             </Badge>
@@ -71,8 +89,13 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
             {cleanAttr}
           </DialogTitle>
 
-          <DialogDescription className="text-xs text-muted-claude">
-            Entity Subject: <strong className="text-ink">{cleanText(fact.subject)}</strong>
+          <DialogDescription className="text-xs text-muted-claude space-y-1">
+            <div>
+              Entity Subject: <strong className="text-ink">{cleanText(fact.subject)}</strong>
+            </div>
+            <div className="text-[11px] text-body">
+              Domain Scope: <span className="font-medium text-ink">{cat.definition}</span>
+            </div>
           </DialogDescription>
         </DialogHeader>
 
