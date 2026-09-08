@@ -4,6 +4,20 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [feat/hybrid-ingestion-fastembed] — 2026-09-08
+
+### Added
+- None
+
+### Modified
+- `backend/app/api/v1/endpoints/documents.py`: Updated `run_ingestion_pipeline` (both isolated session and dependency injection execution branches) to unpack `(blocks, visual_pages)` from `parse_pdf()`, log block and visual page counts, and pass `blocks`, `document_id`, `workspace_id`, `visual_pages`, and `file_bytes` into `extract_facts()` for multimodal vision extraction support.
+
+### Notes
+- Enables hybrid PDF ingestion where complex visual pages (charts, infographics, non-extractable layouts) flagged during layout analysis are routed to Gemini multimodal vision extraction alongside text blocks.
+- Verified with `py_compile` and router import checks.
+
+---
+
 ## [TASK-09] — 2026-09-08
 
 ### Added
