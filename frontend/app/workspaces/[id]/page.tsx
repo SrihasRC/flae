@@ -113,7 +113,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
                   {workspace.name}
                 </h1>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  FLAE Epistemic Fact Knowledge Base & Multi-Document Adjudication
+                  FLAE - Fact Ledger &amp; Arbitration Engine
                 </p>
               </div>
 

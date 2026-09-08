@@ -227,7 +227,7 @@ export default function LandingPage() {
       <footer className="border-t border-hairline py-8 text-center text-xs text-muted-claude bg-canvas">
         <div className="container mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-serif font-semibold text-sm text-ink">
-            FLAE — Epistemic Truth Discovery &amp; Fact Arbitration
+            FLAE - Fact Ledger &amp; Arbitration Engine
           </span>
           <span className="font-mono text-[11px] text-muted-soft">
             Enterprise Dossier Protocol • Deterministic Audit Engine

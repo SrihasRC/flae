@@ -23,7 +23,7 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FLAE — Epistemic Fact-Ledger & Arbitration Engine",
+  title: "FLAE - Fact Ledger & Arbitration Engine",
   description:
     "FLAE: Deterministic Atomic Fact Ledger and Cross-Document Arbitration Engine resolving discrepancies across corporate reports, financial dossiers, and filings.",
 };
