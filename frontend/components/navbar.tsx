@@ -151,16 +151,6 @@ function NavbarContent() {
               >
                 Architecture & Docs
               </Link>
-              <Link
-                href="/cases"
-                className={`text-xs font-medium transition-colors ${
-                  pathname === "/cases"
-                    ? "text-ink dark:text-canvas font-semibold"
-                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
-                }`}
-              >
-                Case Studies
-              </Link>
             </nav>
 
             {/* Normal Mode: Right side Actions */}

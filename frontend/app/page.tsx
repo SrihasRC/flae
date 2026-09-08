@@ -81,61 +81,201 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Feature & Architecture Pillars Section */}
-      <section id="architecture" className="py-16 md:py-24 bg-canvas border-t border-hairline">
+      {/* Paradigm Comparison Strip: Traditional RAG vs FLAE (AKBC) */}
+      <section className="py-16 md:py-20 bg-canvas border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
             <Badge variant="pill" className="text-xs font-mono mb-3">
-              Core Capabilities
+              Theoretical Foundation &amp; Architecture
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
-              Engineered for Auditability, Traceability &amp; Rigor
+              Beyond Naive Chunk-and-Retrieve RAG
             </h2>
             <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
-              Generic LLM summarizers hallucinate when corporate reports disagree. FLAE enforces
-              strict epistemic bounds before comparing claims.
+              Standard RAG systems delay reasoning until query time, producing hallucinations when filings
+              contain apparent contradictions. FLAE is built upon <strong>Automated Knowledge Base Construction (AKBC)</strong> and
+              the <strong>Extended FEVER</strong> paradigm, resolving conflicts during ingestion.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Standard RAG Card */}
+            <Card variant="canvas" className="p-6 border border-hairline/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-claude">
+                  Standard Chunk &amp; Retrieve RAG
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-muted-soft text-muted-claude">
+                  Probabilistic
+                </span>
+              </div>
+              <ul className="space-y-3 text-xs text-muted-claude leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-destructive font-mono text-sm leading-none">•</span>
+                  <span><strong>Blind Text Chunks:</strong> Slices documents into arbitrary token windows without recognizing financial table structures or reporting perimeters.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-destructive font-mono text-sm leading-none">•</span>
+                  <span><strong>Binary FEVER Failure:</strong> Classic NLI models treat Q1 vs FY or Standalone vs Consolidated numbers as irreconcilable refutations.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-destructive font-mono text-sm leading-none">•</span>
+                  <span><strong>Zero Lineage Ledger:</strong> Outputs synthetic generated summaries with no permanent audit trail or immutable evidence verification.</span>
+                </li>
+              </ul>
+            </Card>
+
+            {/* FLAE Epistemic Ledger Card */}
+            <Card variant="cream" className="p-6 border border-coral/30 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-coral">
+                  FLAE Epistemic Fact Ledger (AKBC)
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-coral/15 text-coral font-medium">
+                  Deterministic
+                </span>
+              </div>
+              <ul className="space-y-3 text-xs text-ink leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-accent-teal font-mono text-sm leading-none">✓</span>
+                  <span><strong>Structured Ingestion Pipeline:</strong> Normalizes claims into atomic tuples <code>(Subject, Metric, Value, ContextEnvelope, Evidence)</code> at ingestion time.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent-teal font-mono text-sm leading-none">✓</span>
+                  <span><strong>Extended FEVER Paradigm:</strong> 6-D context envelopes prevent false contradictions by accounting for temporal periods, accounting rules, and organizational scope.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-accent-teal font-mono text-sm leading-none">✓</span>
+                  <span><strong>Data Fusion &amp; LLM-as-a-Judge:</strong> The Arbiter agent clusters candidate pairs via bi-encoder blocking and generates formal reasoning proofs.</span>
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Architectural Pillars */}
+      <section id="architecture" className="py-16 md:py-24 bg-surface-card/40 border-t border-hairline">
+        <div className="container mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="flex flex-col items-center text-center mb-12">
+            <Badge variant="pill" className="text-xs font-mono mb-3">
+              The Three Core Pillars
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
+              Engineered for Statutory Rigor &amp; Auditability
+            </h2>
+            <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
+              FLAE treats financial filings as observer-bound, timeline-bound knowledge claims rather than
+              universal strings.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1: Fact Extraction */}
-            <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+            {/* Pillar 1: Epistemic Knowledge Claim */}
+            <Card variant="cream" className="p-6 space-y-3">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
                 <FileText className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-ink">Atomic Fact Ledger</h3>
+              <h3 className="text-base font-semibold text-ink font-serif">1. Epistemic Knowledge</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
-                Decomposes complex corporate disclosures into discrete, typed claims with numerical
-                normalization, raw strings, units, and verbatim paragraph excerpts.
+                Handles the philosophy of <em>how we know what is true</em>. Instead of treating text as absolute
+                facts, every claim is formally scoped to its observer, fiscal period, and reporting boundary.
               </p>
             </Card>
 
-            {/* Card 2: Context Envelope */}
-            <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+            {/* Pillar 2: Fact-Ledger */}
+            <Card variant="cream" className="p-6 space-y-3">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
                 <Sparkles className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-ink">6-D Context Envelopes</h3>
+              <h3 className="text-base font-semibold text-ink font-serif">2. Fact-Ledger</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
-                Prevents false conflicts by explicitly binding claims to temporal periods, statutory
-                accounting rules, and organizational scope (Standalone vs Consolidated).
+                A single, append-only, structured ledger that acts as the global source of truth. Every claim
+                is permanently stamped with absolute provenance: Document ID, Page Number, and verbatim excerpt.
               </p>
             </Card>
 
-            {/* Card 3: Arbitration Engine */}
-            <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+            {/* Pillar 3: Arbiter Agent */}
+            <Card variant="cream" className="p-6 space-y-3">
+              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
                 <Scale className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-ink">Epistemic Arbiter</h3>
+              <h3 className="text-base font-semibold text-ink font-serif">3. The Arbiter Agent</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
-                Pairwise semantic matching classifies claims into Corroborated, Contradicted, or
-                Reconciled with comprehensive step-by-step reasoning traces.
+                A deterministic LLM-as-a-Judge role acting as judge, jury, and classifier. It performs multi-attribute
+                data fusion, evaluating whether incoming claims corroborate, contradict, or reconcile.
               </p>
             </Card>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-10 text-center">
+      {/* 4-Stage Ingestion Flow */}
+      <section className="py-16 md:py-24 bg-canvas border-t border-hairline">
+        <div className="container mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="flex flex-col items-center text-center mb-12">
+            <Badge variant="pill" className="text-xs font-mono mb-3">
+              System Pipeline
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
+              From Raw PDF to Verified Arbitration Graph
+            </h2>
+            <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
+              Every ingested document passes through four automated stages before entering the immutable audit ledger.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Step 1 */}
+            <div className="p-4 rounded-sm border border-hairline bg-surface-card space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-coral">STAGE 01</span>
+                <span className="text-[10px] font-mono text-muted-soft">PDF Ingestion</span>
+              </div>
+              <h4 className="font-semibold text-xs text-ink">Parser &amp; Coordinate Tracking</h4>
+              <p className="text-[11px] text-muted-claude leading-relaxed">
+                Extracts financial disclosures, structured balance sheets, and narrative footnotes with page-level bounding.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="p-4 rounded-sm border border-hairline bg-surface-card space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-coral">STAGE 02</span>
+                <span className="text-[10px] font-mono text-muted-soft">Information Extraction</span>
+              </div>
+              <h4 className="font-semibold text-xs text-ink">Atomic Fact Schemas</h4>
+              <p className="text-[11px] text-muted-claude leading-relaxed">
+                Deconstructs text into canonical tuples with numerical values, units, and 6-D context envelopes.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="p-4 rounded-sm border border-hairline bg-surface-card space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-coral">STAGE 03</span>
+                <span className="text-[10px] font-mono text-muted-soft">Record Linkage</span>
+              </div>
+              <h4 className="font-semibold text-xs text-ink">Candidate Clustering</h4>
+              <p className="text-[11px] text-muted-claude leading-relaxed">
+                Uses bi-encoder vector similarity in ChromaDB to block and cluster related claims, avoiding O(N²) scaling.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="p-4 rounded-sm border border-hairline bg-surface-card space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-coral">STAGE 04</span>
+                <span className="text-[10px] font-mono text-muted-soft">LLM-as-a-Judge</span>
+              </div>
+              <h4 className="font-semibold text-xs text-ink">Epistemic Arbitration</h4>
+              <p className="text-[11px] text-muted-claude leading-relaxed">
+                The Arbiter adjudicates disputes, classifies relationships, and writes persistent step-by-step reasoning proofs.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
             <Link
               href="/docs"
               className={cn(
@@ -143,95 +283,188 @@ export default function LandingPage() {
                 "text-xs font-medium px-4 gap-1.5"
               )}
             >
-              <span>Explore Complete Architecture &amp; System Docs</span>
+              <span>View Full Academic Grounding &amp; Architecture Docs</span>
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Epistemic Showcase Section */}
-      <section id="cases" className="py-16 md:py-24 border-t border-hairline bg-surface-soft/50">
+      {/* Decision Matrix: 3 Epistemic Outcomes */}
+      <section className="py-16 md:py-24 bg-surface-soft/40 border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
             <Badge variant="pill" className="text-xs font-mono mb-3">
-              Case Study Explorer
+              Arbitration Classification
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
-              Demonstrated on Delhivery Limited Filings
+              The Three Epistemic Resolutions
             </h2>
             <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
-              Inspect how the engine processes real-world filings including the FY24 Annual Report
-              and Q4 FY24 Earnings Presentation.
+              How the Arbiter resolves pairwise claims across corporate filings.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card variant="canvas" className="p-6 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Corroborated */}
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-sm text-ink">
-                  Case 1 &amp; 2: Corroboration &amp; Contradiction
-                </span>
+                <span className="font-semibold text-sm text-ink font-serif">Corroborated</span>
                 <Badge variant="teal" className="text-[10px] font-mono">
-                  Verified
+                  CORROBORATED
                 </Badge>
               </div>
               <p className="text-xs text-muted-claude leading-relaxed">
-                Identifies claims that corroborate identically across filings (e.g. shipment volume,
-                network scale) and surfaces genuine contradictions (e.g. board member counts or
-                conflicting revisions) with juxtaposed quote excerpts.
+                Claims state identical numbers and assertions under matching context scopes. Verified by dual verbatim citations across separate filings.
               </p>
             </Card>
 
-            <Card variant="canvas" className="p-6 space-y-3">
+            {/* Contradicted */}
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-sm text-ink">
-                  Case 3: Epistemic Reconciliation
-                </span>
-                <Badge variant="amber" className="text-[10px] font-mono">
-                  Context Aware
+                <span className="font-semibold text-sm text-ink font-serif">Contradicted</span>
+                <Badge variant="destructive" className="text-[10px] font-mono">
+                  CONTRADICTED
                 </Badge>
               </div>
               <p className="text-xs text-muted-claude leading-relaxed">
-                Resolves apparent discrepancies such as Standalone Revenue (₹74,540 M) versus
-                Consolidated Revenue (₹81,415 M) by demonstrating that organizational boundary divergence
-                explains the mathematical delta.
+                Claims describe the exact same entity, period, and accounting standard, but assert irreconcilably conflicting numbers or qualitative states.
+              </p>
+            </Card>
+
+            {/* Reconciled */}
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm text-ink font-serif">Context Reconciled</span>
+                <Badge variant="amber" className="text-[10px] font-mono">
+                  RECONCILED
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-claude leading-relaxed">
+                Apparent discrepancies (e.g. ₹74,540M vs ₹81,415M) are proven mathematically valid once organizational boundary or temporal qualifier divergence is identified.
               </p>
             </Card>
           </div>
 
-          <div className="mt-12 flex items-center justify-center gap-3">
+          <div className="mt-10 flex items-center justify-center gap-3">
             <Link
-              href="/cases"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "text-xs font-medium px-4"
-              )}
-            >
-              Read Detailed Case Studies
-            </Link>
-            <Link
-              href="/workspaces/b097fafc-4e75-442d-8065-b4cee73091b9?tab=arbitration"
+              href="/workspaces"
               className={cn(
                 buttonVariants({ variant: "coral", size: "sm" }),
-                "text-xs font-medium px-4"
+                "text-xs font-medium px-4 gap-1.5"
               )}
             >
-              Open Delhivery Live Console
+              <span>Explore Active Workspaces</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-hairline py-8 text-center text-xs text-muted-claude bg-canvas">
-        <div className="container mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-serif font-semibold text-sm text-ink">
-            FLAE - Fact Ledger &amp; Arbitration Engine
-          </span>
-          <span className="font-mono text-[11px] text-muted-soft">
-            Enterprise Dossier Protocol • Deterministic Audit Engine
-          </span>
+      {/* Comprehensive Proper Footer */}
+      <footer className="border-t border-hairline bg-surface-card/60 pt-12 pb-8 text-xs text-muted-claude">
+        <div className="container mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-hairline/80">
+            {/* Col 1: Brand & Overview */}
+            <div className="space-y-3 md:col-span-1">
+              <div className="flex items-center gap-2">
+                <span className="font-serif font-bold text-base text-ink tracking-tight">
+                  FLAE
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-xs bg-surface-soft border border-hairline text-muted-claude">
+                  v1.0
+                </span>
+              </div>
+              <p className="text-xs text-muted-claude leading-relaxed">
+                Fact Ledger &amp; Arbitration Engine. Automated Knowledge Base Construction and multi-document
+                epistemic adjudication for regulatory disclosures.
+              </p>
+            </div>
+
+            {/* Col 2: Product & System */}
+            <div className="space-y-2.5">
+              <h5 className="font-mono font-semibold text-[11px] text-ink uppercase tracking-wider">
+                System
+              </h5>
+              <ul className="space-y-2 text-xs">
+                <li>
+                  <Link href="/workspaces" className="hover:text-ink transition-colors">
+                    Workspaces Hub
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs" className="hover:text-ink transition-colors">
+                    Architecture &amp; Specifications
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/workspaces/b097fafc-4e75-442d-8065-b4cee73091b9" className="hover:text-ink transition-colors">
+                    Delhivery Test Dossier
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 3: Academic Foundations */}
+            <div className="space-y-2.5">
+              <h5 className="font-mono font-semibold text-[11px] text-ink uppercase tracking-wider">
+                Paradigms
+              </h5>
+              <ul className="space-y-2 text-xs">
+                <li>
+                  <span className="text-muted-claude">Auto Knowledge Base (AKBC)</span>
+                </li>
+                <li>
+                  <span className="text-muted-claude">Extended FEVER Framework</span>
+                </li>
+                <li>
+                  <span className="text-muted-claude">Data Fusion &amp; Conflict Resolution</span>
+                </li>
+                <li>
+                  <span className="text-muted-claude">LLM-as-a-Judge Arbitration</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: Audit & Lineage */}
+            <div className="space-y-2.5">
+              <h5 className="font-mono font-semibold text-[11px] text-ink uppercase tracking-wider">
+                Audit Guarantees
+              </h5>
+              <ul className="space-y-2 text-xs">
+                <li>
+                  <span className="text-muted-claude">100% Verbatim Citation Lineage</span>
+                </li>
+                <li>
+                  <span className="text-muted-claude">Immutable Event-Sourced Ledger</span>
+                </li>
+                <li>
+                  <span className="text-muted-claude">6-D Context Envelope Scoping</span>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/SrihasRC/flae"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-coral hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>GitHub Open Source</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted-soft">
+            <span>
+              FLAE - Fact Ledger &amp; Arbitration Engine • Enterprise Dossier Protocol
+            </span>
+            <span className="font-mono">
+              Deterministic Truth Discovery Architecture
+            </span>
+          </div>
         </div>
       </footer>
     </div>

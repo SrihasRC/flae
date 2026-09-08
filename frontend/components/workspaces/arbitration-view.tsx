@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   GitCompare,
-  FileSearch,
 } from "lucide-react";
 import {
   ArbitrationRead,
@@ -21,7 +20,7 @@ import {
 } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { formatEvidenceQuote } from "@/lib/formatters";
 
 interface ArbitrationViewProps {
@@ -30,7 +29,7 @@ interface ArbitrationViewProps {
 
 export function ArbitrationView({ workspaceId }: ArbitrationViewProps) {
   const [viewMode, setViewMode] = useState<"showcase" | "all">("showcase");
-  const [activeCase, setActiveCase] = useState<"1" | "2" | "3" | "4">("1");
+  const [activeCase, setActiveCase] = useState<"1" | "2" | "3">("1");
   const [casesData, setCasesData] = useState<CaseExplorerResponse | null>(null);
 
   // All arbitrations list
@@ -123,7 +122,7 @@ export function ArbitrationView({ workspaceId }: ArbitrationViewProps) {
     }
   };
 
-  // Render showcase items for Case 1, 2, 3, or Case 4 note
+  // Render showcase items for Case 1, 2, or 3
   const getActiveShowcaseList = (): ArbitrationRead[] => {
     if (!casesData) return [];
     if (activeCase === "1") return casesData.case_1_corroborated || [];
@@ -199,7 +198,7 @@ export function ArbitrationView({ workspaceId }: ArbitrationViewProps) {
             className="h-7 text-xs font-medium px-3"
             onClick={() => setViewMode("showcase")}
           >
-            Case 1–4 Showcase
+            Case Showcase
           </Button>
           <Button
             variant={viewMode === "all" ? "default" : "ghost"}
@@ -251,51 +250,20 @@ export function ArbitrationView({ workspaceId }: ArbitrationViewProps) {
             >
               Case 3: Reconciled
             </Button>
-            <Button
-              variant={activeCase === "4" ? "secondary" : "outline"}
-              size="sm"
-              className="h-7 text-xs px-2.5 gap-1"
-              onClick={() => setActiveCase("4")}
-            >
-              Case 4: Failure Audits
-            </Button>
           </div>
         )}
       </div>
-
-      {/* Case 4 special explainer */}
-      {viewMode === "showcase" && activeCase === "4" && (
-        <Card className="border border-border/80 bg-muted/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <FileSearch className="h-4 w-4 text-foreground" />
-              Case 4: Extraction & Reasoning Failure Analysis (Audit Trail)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-xs text-muted-foreground space-y-2">
-            <p>
-              In strict regulatory auditing, extraction failures (e.g. unparseable scanned tables,
-              ambiguous currency abbreviations, or unresolvable temporal windows) are not discarded.
-              They are logged with explicit failure diagnostics.
-            </p>
-            <p>
-              Check the <strong>Documents</strong> tab or view document ingestion status logs to inspect
-              any malformed records or boundary mismatch audits.
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Arbitration items list */}
       {loading && viewMode === "all" ? (
         <div className="p-12 text-center text-xs text-muted-foreground">
           Loading arbitration results...
         </div>
-      ) : currentDisplayList.length === 0 && !(viewMode === "showcase" && activeCase === "4") ? (
+      ) : currentDisplayList.length === 0 ? (
         <div className="p-12 text-center rounded-xl border border-dashed border-border/80 bg-card space-y-3">
           <p className="text-xs text-muted-foreground">
             {viewMode === "showcase"
-              ? "No arbitration cases registered for this category yet. Click 'Run Arbitration' above to generate cross-document comparisons."
+              ? "No arbitration cases registered for this category yet in this workspace. Click 'Run Arbitration' above to generate cross-document comparisons."
               : "No arbitration results found."}
           </p>
           <Button
