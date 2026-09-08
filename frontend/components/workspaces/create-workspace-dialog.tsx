@@ -60,7 +60,7 @@ export function CreateWorkspaceDialog({ onCreated }: CreateWorkspaceDialogProps)
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button size="sm" className="w-full gap-1.5 text-xs font-medium">
+          <Button size="sm" className="w-full gap-1.5 text-xs font-medium rounded-sm">
             <Plus className="h-3.5 w-3.5" />
             <span>New Workspace</span>
           </Button>

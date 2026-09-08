@@ -44,7 +44,7 @@ export default function WorkspacesPage() {
   const delhiveryWs = workspaces.find((w) => w.name.toLowerCase().includes("delhivery"));
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20 p-4 lg:p-6 gap-6 bg-canvas">
       {/* Left Sidebar in 'list' mode */}
       <WorkspaceSidebar
         mode="list"
@@ -53,7 +53,7 @@ export default function WorkspacesPage() {
       />
 
       {/* Right Side Placeholder / Hub Dashboard */}
-      <main className="flex-1 p-6 lg:p-8 bg-muted/10 overflow-y-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Welcome Header */}
           <div>

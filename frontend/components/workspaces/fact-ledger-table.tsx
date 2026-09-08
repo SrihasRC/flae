@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import { DocumentRead, FactRead } from "@/lib/types";
 import { listFacts } from "@/lib/api";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,7 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
     let active = true;
     listFacts(workspaceId, {
       document_id: selectedDocId || undefined,
-      subject: activeSearch.trim() || undefined,
+      query: activeSearch.trim() || undefined,
       skip: page * limit,
       limit,
     })
@@ -74,29 +74,62 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
     setActiveSearch(searchInput);
   };
 
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setActiveSearch("");
+    setPage(0);
+  };
+
   const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="space-y-4">
       {/* Top filter toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3 rounded-xl border border-border/70">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-card p-3 rounded-sm border border-hairline shadow-xs">
         <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-claude" />
             <Input
-              placeholder="Search by subject or attribute (e.g. Revenue, Shipment)..."
+              placeholder="Search across metrics, attributes, values (e.g. Revenue, EBITDA, Options)..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-8 h-8 text-xs w-full"
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                if (e.target.value === "" && activeSearch !== "") {
+                  setActiveSearch("");
+                  setPage(0);
+                }
+              }}
+              className="pl-8 pr-8 h-8 text-xs w-full rounded-sm border-hairline bg-canvas text-ink"
             />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-claude hover:text-ink transition-colors"
+                title="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-          <Button type="submit" size="sm" variant="secondary" className="h-8 text-xs font-medium px-3">
+          <Button type="submit" size="sm" variant="secondary" className="h-8 text-xs font-medium px-3 rounded-sm border border-hairline">
             Search
           </Button>
+          {activeSearch && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={handleClearSearch}
+              className="h-8 text-xs font-medium px-2 text-muted-claude hover:text-ink rounded-sm"
+            >
+              Reset
+            </Button>
+          )}
         </form>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-muted-claude font-medium">
             <Filter className="h-3.5 w-3.5" />
             <span className="hidden md:inline">Document:</span>
           </div>
@@ -106,9 +139,9 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
               setSelectedDocId(e.target.value);
               setPage(0);
             }}
-            className="h-8 text-xs rounded-md border border-input bg-background px-2.5 py-1 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            className="h-8 text-xs rounded-sm border border-hairline bg-canvas px-2.5 py-1 text-ink focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            <option value="">All Documents</option>
+            <option value="">All Documents ({documents.length})</option>
             {documents.map((doc) => (
               <option key={doc.id} value={doc.id}>
                 {doc.filename.length > 35 ? `${doc.filename.slice(0, 35)}...` : doc.filename}
@@ -121,18 +154,23 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
       {/* Summary count */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-foreground">Atomic Fact Ledger</span>
-          <Badge variant="outline" className="text-[10px] font-mono">
+          <span className="text-xs font-semibold text-ink font-mono">Atomic Fact Ledger</span>
+          <Badge variant="outline" className="text-[10px] font-mono rounded-xs">
             {total.toLocaleString()} facts
           </Badge>
+          {activeSearch && (
+            <span className="text-[11px] text-muted-claude">
+              matching &quot;{activeSearch}&quot;
+            </span>
+          )}
         </div>
-        <span className="text-[11px] text-muted-foreground">
+        <span className="text-[11px] text-muted-claude font-mono">
           Showing {total === 0 ? 0 : page * limit + 1}–{Math.min((page + 1) * limit, total)} of {total}
         </span>
       </div>
 
       {/* Table container */}
-      <div className="rounded-xl border border-hairline bg-canvas overflow-hidden">
+      <div className="rounded-sm border border-hairline bg-canvas overflow-hidden shadow-xs">
         {loading ? (
           <div className="p-12 text-center text-xs text-muted-claude">
             Loading facts from ledger...

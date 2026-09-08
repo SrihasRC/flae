@@ -89,7 +89,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20 p-4 lg:p-6 gap-6 bg-canvas">
       {/* Left Sidebar in 'active' mode */}
       <WorkspaceSidebar
         mode="active"
@@ -99,7 +99,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
       />
 
       {/* Right Side 4-Tab Classified Layout */}
-      <main className="flex-1 p-4 lg:p-6 bg-muted/10 overflow-y-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto">
         <div className="max-w-6xl mx-auto space-y-6">
           <Tabs
             value={currentTab}

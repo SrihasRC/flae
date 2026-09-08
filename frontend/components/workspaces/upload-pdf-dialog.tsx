@@ -83,7 +83,7 @@ export function UploadPdfDialog({ workspaceId, onUploaded }: UploadPdfDialogProp
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button size="sm" className="w-full gap-1.5 text-xs font-medium">
+          <Button size="sm" className="w-full gap-1.5 text-xs font-medium rounded-sm">
             <Upload className="h-3.5 w-3.5" />
             <span>Upload PDF</span>
           </Button>
