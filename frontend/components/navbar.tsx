@@ -162,20 +162,11 @@ function NavbarContent() {
                 aria-label="GitHub Repository"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-8 w-8 text-muted-claude hover:text-ink dark:hover:text-canvas"
+                  "h-8 w-8 text-black hover:text-ink dark:hover:text-canvas"
                 )}
               >
-                <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={1.5} />
+                <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={2} />
               </a>
-              <Link
-                href="/workspaces"
-                className={cn(
-                  buttonVariants({ variant: "coral", size: "sm" }),
-                  "h-8 text-xs font-medium px-3.5 shadow-xs"
-                )}
-              >
-                Launch Console
-              </Link>
             </div>
           </>
         )}

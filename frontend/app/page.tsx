@@ -105,7 +105,7 @@ export default function LandingPage() {
                 <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-claude">
                   Standard Chunk &amp; Retrieve RAG
                 </span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-muted-soft text-muted-claude">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-muted-soft text-muted">
                   Probabilistic
                 </span>
               </div>
@@ -158,9 +158,6 @@ export default function LandingPage() {
       <section id="architecture" className="py-16 md:py-24 bg-surface-card/40 border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <Badge variant="pill" className="text-xs font-mono mb-3">
-              The Three Core Pillars
-            </Badge>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
               Engineered for Statutory Rigor &amp; Auditability
             </h2>
@@ -172,10 +169,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Pillar 1: Epistemic Knowledge Claim */}
-            <Card variant="cream" className="p-6 space-y-3">
-              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
-                <FileText className="h-4 w-4 text-coral" />
-              </div>
+            <Card variant="cream" className="p-6">
               <h3 className="text-base font-semibold text-ink font-serif">1. Epistemic Knowledge</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 Handles the philosophy of <em>how we know what is true</em>. Instead of treating text as absolute
@@ -184,10 +178,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Pillar 2: Fact-Ledger */}
-            <Card variant="cream" className="p-6 space-y-3">
-              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
-                <Sparkles className="h-4 w-4 text-coral" />
-              </div>
+            <Card variant="cream" className="p-6">
               <h3 className="text-base font-semibold text-ink font-serif">2. Fact-Ledger</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 A single, append-only, structured ledger that acts as the global source of truth. Every claim
@@ -196,10 +187,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Pillar 3: Arbiter Agent */}
-            <Card variant="cream" className="p-6 space-y-3">
-              <div className="h-8 w-8 rounded-sm bg-surface-soft border border-hairline flex items-center justify-center mb-1">
-                <Scale className="h-4 w-4 text-coral" />
-              </div>
+            <Card variant="cream" className="p-6">
               <h3 className="text-base font-semibold text-ink font-serif">3. The Arbiter Agent</h3>
               <p className="text-xs text-muted-claude leading-relaxed">
                 A deterministic LLM-as-a-Judge role acting as judge, jury, and classifier. It performs multi-attribute
@@ -214,9 +202,6 @@ export default function LandingPage() {
       <section className="py-16 md:py-24 bg-canvas border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <Badge variant="pill" className="text-xs font-mono mb-3">
-              System Pipeline
-            </Badge>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
               From Raw PDF to Verified Arbitration Graph
             </h2>
@@ -294,9 +279,6 @@ export default function LandingPage() {
       <section className="py-16 md:py-24 bg-surface-soft/40 border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <Badge variant="pill" className="text-xs font-mono mb-3">
-              Arbitration Classification
-            </Badge>
             <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
               The Three Epistemic Resolutions
             </h2>
@@ -307,12 +289,9 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Corroborated */}
-            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm text-ink font-serif">Corroborated</span>
-                <Badge variant="teal" className="text-[10px] font-mono">
-                  CORROBORATED
-                </Badge>
               </div>
               <p className="text-xs text-muted-claude leading-relaxed">
                 Claims state identical numbers and assertions under matching context scopes. Verified by dual verbatim citations across separate filings.
@@ -320,12 +299,9 @@ export default function LandingPage() {
             </Card>
 
             {/* Contradicted */}
-            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm text-ink font-serif">Contradicted</span>
-                <Badge variant="destructive" className="text-[10px] font-mono">
-                  CONTRADICTED
-                </Badge>
               </div>
               <p className="text-xs text-muted-claude leading-relaxed">
                 Claims describe the exact same entity, period, and accounting standard, but assert irreconcilably conflicting numbers or qualitative states.
@@ -333,12 +309,9 @@ export default function LandingPage() {
             </Card>
 
             {/* Reconciled */}
-            <Card variant="canvas" className="p-6 border border-hairline shadow-xs space-y-2.5">
+            <Card variant="canvas" className="p-6 border border-hairline shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm text-ink font-serif">Context Reconciled</span>
-                <Badge variant="amber" className="text-[10px] font-mono">
-                  RECONCILED
-                </Badge>
               </div>
               <p className="text-xs text-muted-claude leading-relaxed">
                 Apparent discrepancies (e.g. ₹74,540M vs ₹81,415M) are proven mathematically valid once organizational boundary or temporal qualifier divergence is identified.
@@ -448,7 +421,7 @@ export default function LandingPage() {
                     rel="noopener noreferrer"
                     className="text-coral hover:underline inline-flex items-center gap-1"
                   >
-                    <span>GitHub Open Source</span>
+                    <span>GitHub</span>
                     <ArrowRight className="h-3 w-3" />
                   </a>
                 </li>
@@ -457,12 +430,9 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted-soft">
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-[11px] text-muted-soft">
             <span>
-              FLAE - Fact Ledger &amp; Arbitration Engine • Enterprise Dossier Protocol
-            </span>
-            <span className="font-mono">
-              Deterministic Truth Discovery Architecture
+              FLAE - Fact Ledger &amp; Arbitration Engine
             </span>
           </div>
         </div>
