@@ -36,7 +36,9 @@ class Settings(BaseSettings):
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8001
     CHROMA_COLLECTION_PREFIX: str = "fact_ledger"
-    CHROMA_PERSISTENT_PATH: str = "chroma_data"
+    CHROMA_PERSISTENT_PATH: str = str(
+        Path(__file__).resolve().parent.parent.parent / "chroma_data"
+    )
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
