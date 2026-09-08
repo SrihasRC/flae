@@ -4,6 +4,24 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [fix/local-postgres-chroma-setup] — 2026-09-08
+
+### Added
+- `.gitignore`: Comprehensive gitignore rules ignoring `__pycache__/`, `*.py[cod]`, `*$py.class`, `*.so`, `.pytest_cache/`, `.ruff_cache/`, `backend/uploads/`, `uploads/`, `backend/chroma_data/`, and `chroma_data/`.
+
+### Modified
+- `.env`: Configured passwordless local PostgreSQL connection string `DATABASE_URL=postgresql+asyncpg://localhost:5432/fact_ledger`.
+- `backend/app/core/config.py`: Updated default `DATABASE_URL` to passwordless local URI and added `CHROMA_PERSISTENT_PATH = "chroma_data"` to `Settings`.
+- `backend/app/core/database.py`: Added explicit model imports (`workspace`, `document`, `fact`, `arbitration`) in `init_db()`, automated PostgreSQL database creation via default maintenance database (`postgres`/`template1`) on `InvalidCatalogNameError`, and clear lifecycle logging.
+- `backend/app/services/vector_store.py`: Enhanced `VectorStoreService` with zero-config local persistent storage fallback (`chromadb.PersistentClient`) when the Chroma HTTP server is unreachable, and added `client_type` property.
+- `backend/app/main.py`: Updated application `lifespan` and `/health` endpoint to initialize and report connectivity for both HTTP and Persistent ChromaDB clients with diagnostic logging.
+
+### Notes
+- Enables out-of-the-box local development with passwordless PostgreSQL and zero-dependency embedded ChromaDB persistent storage.
+- Verified cleanly through `uvicorn` startup sequence and `/health` check returning HTTP 200 with both `database` and `vector_store` reported as `connected`.
+
+---
+
 ## [feat/hybrid-ingestion-fastembed] — 2026-09-08
 
 ### Added

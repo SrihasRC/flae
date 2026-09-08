@@ -20,11 +20,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/fact_ledger"
+    DATABASE_URL: str = "postgresql+asyncpg://localhost:5432/fact_ledger"
     GEMINI_API_KEY: str = ""
     CHROMA_HOST: str = "localhost"
     CHROMA_PORT: int = 8000
     CHROMA_COLLECTION_PREFIX: str = "fact_ledger"
+    CHROMA_PERSISTENT_PATH: str = "chroma_data"
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod

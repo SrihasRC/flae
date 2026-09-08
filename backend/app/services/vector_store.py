@@ -33,43 +33,81 @@ class VectorStoreService:
         self,
         host: Optional[str] = None,
         port: Optional[int] = None,
+        persistent_path: Optional[str] = None,
         client: Optional[ClientAPI] = None,
     ) -> None:
         self._host = host or settings.CHROMA_HOST
         self._port = port or settings.CHROMA_PORT
+        self._persistent_path = persistent_path or settings.CHROMA_PERSISTENT_PATH
         self._client: Optional[ClientAPI] = client
         if self._client is None:
             try:
-                self._client = chromadb.HttpClient(host=self._host, port=self._port)
+                self._client = self._init_client()
             except Exception as exc:
                 logger.warning(
-                    "Could not connect to Chroma server at %s:%s during initialization (%s). "
-                    "Client connection will be deferred until the first operation.",
-                    self._host,
-                    self._port,
+                    "Could not initialize Chroma client during service startup (%s). "
+                    "Client connection will be deferred until first operation.",
                     exc,
                 )
+
+    def _init_client(self) -> ClientAPI:
+        """Initialize ChromaDB client.
+
+        Tries connecting via HttpClient first. If CHROMA_HOST is 'localhost' and no external
+        Chroma HTTP server responds, or if HttpClient fails, seamlessly falls back to
+        chromadb.PersistentClient(path=settings.CHROMA_PERSISTENT_PATH).
+        """
+        try:
+            client = chromadb.HttpClient(host=self._host, port=self._port)
+            client.heartbeat()
+            logger.info("ChromaDB connected at %s:%s", self._host, self._port)
+            return client
+        except Exception as exc:
+            logger.info(
+                "Could not connect to Chroma HTTP server at %s:%s (%s). "
+                "Falling back to PersistentClient at %s.",
+                self._host,
+                self._port,
+                exc,
+                self._persistent_path,
+            )
+            try:
+                client = chromadb.PersistentClient(path=self._persistent_path)
+                client.heartbeat()
+                logger.info(
+                    "ChromaDB ready (PersistentClient at %s)", self._persistent_path
+                )
+                return client
+            except Exception as persist_exc:
+                logger.error(
+                    "Failed to initialize PersistentClient at %s: %s",
+                    self._persistent_path,
+                    persist_exc,
+                )
+                raise
 
     @property
     def client(self) -> ClientAPI:
         """Get or initialize the ChromaDB client lazily."""
         if self._client is None:
-            try:
-                self._client = chromadb.HttpClient(host=self._host, port=self._port)
-            except Exception as exc:
-                logger.error(
-                    "Failed to connect to Chroma server at %s:%s: %s",
-                    self._host,
-                    self._port,
-                    exc,
-                )
-                raise
+            self._client = self._init_client()
         return self._client
 
     @client.setter
     def client(self, value: ClientAPI) -> None:
         """Allow setting or overriding the ChromaDB client (e.g. for testing)."""
         self._client = value
+
+    @property
+    def client_type(self) -> str:
+        """Return 'persistent' or 'http' based on active Chroma client configuration."""
+        try:
+            settings_obj = self.client.get_settings()
+            if getattr(settings_obj, "is_persistent", False):
+                return "persistent"
+        except Exception:
+            pass
+        return "http"
 
     def get_or_create_collection(self, workspace_id: Union[str, uuid.UUID]) -> Collection:
         """Retrieve or create an isolated collection for a specific workspace.
