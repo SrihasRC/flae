@@ -4,6 +4,31 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [TASK-03] — 2026-09-08
+
+### Added
+- `backend/app/models/__init__.py`: Package initialization marker for database models.
+- `backend/app/models/workspace.py`: SQLAlchemy 2.0 ORM model for isolated domain workspaces (`Workspace`) with UUID primary key, unique name index, and timestamp.
+- `backend/app/models/document.py`: SQLAlchemy 2.0 ORM model for uploaded PDF documents (`Document`) with foreign key reference to workspaces (ondelete CASCADE), pipeline status, page count, and failure error fields.
+- `backend/app/models/fact.py`: SQLAlchemy 2.0 ORM model for extracted atomic facts (`Fact`) with JSONB context envelope and grounded evidence fields, embedding ID reference, and `fact_id` alias interoperability.
+- `backend/app/models/arbitration.py`: SQLAlchemy 2.0 ORM model for cross-document fact adjudication records (`Arbitration`) with JSONB evidence comparison, confidence scoring, reasoning trace, and `arbitration_id` alias interoperability.
+- `backend/app/repositories/__init__.py`: Package initialization marker for repository layer.
+- `backend/app/repositories/workspace_repository.py`: Async repository (`WorkspaceRepository`) providing create, get_by_id, get_by_name, list_all, and delete operations.
+- `backend/app/repositories/document_repository.py`: Async repository (`DocumentRepository`) providing create, get_by_id, list_by_workspace, update_status (with facts_extracted and error), count_by_workspace, and delete operations.
+- `backend/app/repositories/fact_repository.py`: Async repository (`FactRepository`) providing create_bulk, get_by_id, list_by_workspace (with optional filtering by document, subject, attribute), list_by_document, count_by_workspace, and delete_by_document operations.
+- `backend/app/repositories/arbitration_repository.py`: Async repository (`ArbitrationRepository`) providing create_bulk, get_by_id, list_by_workspace (with relationship and min_confidence filters), list_by_relationship, count_by_workspace, and delete_by_workspace operations.
+
+### Modified
+- None
+
+### Notes
+- All models inherit from `Base` (`DeclarativeBase`) in `app.core.database`.
+- PostgreSQL dialect types (`UUID(as_uuid=True)`, `JSONB`) are utilized for canonical schema alignment and fast JSON indexing.
+- Both `Fact` and `Arbitration` models include bidirectional property aliases (`fact_id` <-> `id` and `arbitration_id` <-> `id`) and constructor kwargs mapping for seamless Pydantic serialization/deserialization.
+- Repositories are asynchronous, accept `AsyncSession`, use SQLAlchemy 2.0 executable statements (`select()`, `delete()`, `func.count()`), and handle UUID string coercion transparently.
+
+---
+
 ## [TASK-02] — 2026-09-08
 
 ### Added
