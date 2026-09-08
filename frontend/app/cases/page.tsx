@@ -12,18 +12,18 @@ export const metadata = {
 
 export default function CasesPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#faf9f5]">
+    <div className="flex flex-col min-h-screen bg-canvas">
       {/* Editorial Header */}
-      <section className="pt-12 pb-16 md:pt-16 md:pb-20 border-b border-[#e6dfd8]">
+      <section className="pt-12 pb-16 md:pt-16 md:pb-20 border-b border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-start max-w-3xl">
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Empirical Dossier Exhibits
             </Badge>
-            <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-[#141413] leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-ink leading-tight">
               Case 1–4 Arbitration Showcase
             </h1>
-            <p className="mt-4 text-base sm:text-lg text-[#3d3d3a] leading-relaxed">
+            <p className="mt-4 text-base sm:text-lg text-body leading-relaxed">
               Real-world filings from Delhivery Limited (FY24 Annual Report &amp; Q4 FY24 Earnings Presentation)
               demonstrating how FLAE classifies cross-document evidence with mathematical certainty.
             </p>
@@ -52,41 +52,41 @@ export default function CasesPage() {
               <Badge variant="teal" className="text-[11px] font-mono uppercase">
                 Case 1: Corroborated
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-ink">
                 Direct Cross-Filing Verification
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-[#6c6a64] leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-claude leading-relaxed">
               When distinct statutory documents confirm identical claims, the engine establishes a high-confidence
               corroboration node with cross-document citation anchors.
             </p>
 
             <Card variant="cream" className="p-5 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#141413]">
+                <span className="font-semibold text-ink">
                   Express Parcel Shipment Volume (FY24)
                 </span>
-                <span className="font-mono text-[#6c6a64]">Confidence: 97%</span>
+                <span className="font-mono text-muted-claude">Confidence: 97%</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 1 (Annual Report FY24) — Page 44
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;Total express parcel volume for FY24 reached 740 million shipments across India.&rdquo;
                   </p>
                 </div>
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 2 (Q4 FY24 Investor Presentation) — Page 12
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;Express parcel shipments stood at 740 million parcels for full year FY24.&rdquo;
                   </p>
                 </div>
               </div>
-              <div className="p-2.5 rounded bg-[#f5f0e8] text-[11px] text-[#3d3d3a] border border-[#e6dfd8]">
+              <div className="p-2.5 rounded bg-surface-soft text-[11px] text-body border border-hairline">
                 <strong>Arbiter Verdict:</strong> Corroborated. Identical temporal period (FY24), entity scope
                 (consolidated network), and volume metric (740 M parcels).
               </div>
@@ -99,41 +99,41 @@ export default function CasesPage() {
               <Badge variant="destructive" className="text-[11px] font-mono uppercase">
                 Case 2: Contradicted
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-ink">
                 Genuine Discrepancies &amp; Revisions
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-[#6c6a64] leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-claude leading-relaxed">
               When documents report conflicting figures under the exact same scope without statutory reconciliation,
               the engine flags a critical contradiction requiring audit resolution.
             </p>
 
             <Card variant="cream" className="p-5 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#141413]">
+                <span className="font-semibold text-ink">
                   Statutory Board Size &amp; Composition
                 </span>
-                <span className="font-mono text-[#c64545] font-semibold">Confidence: 94%</span>
+                <span className="font-mono text-destructive font-semibold">Confidence: 94%</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 1 — Corporate Governance Note
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;The Board comprises 7 directors, of which 4 are independent directors.&rdquo;
                   </p>
                 </div>
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 2 — Shareholder Presentation
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;Our leadership team is guided by a Board of 9 directors as of March 31, 2024.&rdquo;
                   </p>
                 </div>
               </div>
-              <div className="p-2.5 rounded bg-[#f5f0e8] text-[11px] text-[#3d3d3a] border border-[#e6dfd8]">
+              <div className="p-2.5 rounded bg-surface-soft text-[11px] text-body border border-hairline">
                 <strong>Arbiter Verdict:</strong> Contradicted. Conflicting board headcounts (7 vs 9) cited for the same
                 effective reporting date without an explanatory addendum.
               </div>
@@ -146,43 +146,43 @@ export default function CasesPage() {
               <Badge variant="amber" className="text-[11px] font-mono uppercase">
                 Case 3: Reconciled
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-ink">
                 Scope &amp; Methodology Divergence (Standalone vs. Consolidated)
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-[#6c6a64] leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-claude leading-relaxed">
               Apparent numerical discrepancies that confuse traditional LLMs are resolved mathematically through
               explicit contextual envelopes.
             </p>
 
             <Card variant="cream" className="p-5 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#141413]">
+                <span className="font-semibold text-ink">
                   Revenue from Operations (FY24)
                 </span>
-                <span className="font-mono text-[#e8a55a] font-semibold">Confidence: 98%</span>
+                <span className="font-mono text-accent-amber font-semibold">Confidence: 98%</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 1 (Standalone P&amp;L) — Page 44
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;Revenue from operations on standalone basis for FY24 stood at ₹74,540.82 million.&rdquo;
                   </p>
                 </div>
-                <div className="p-3 rounded-lg bg-[#faf9f5] border border-[#e6dfd8] space-y-1">
-                  <span className="text-[10px] font-semibold text-[#6c6a64] uppercase block">
+                <div className="p-3 rounded-lg bg-canvas border border-hairline space-y-1">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase block">
                     Document 2 (Consolidated P&amp;L) — Page 44
                   </span>
-                  <p className="italic text-[#141413]">
+                  <p className="italic text-ink">
                     &ldquo;Revenue from operations on consolidated basis for FY24 stood at ₹81,415.38 million.&rdquo;
                   </p>
                 </div>
               </div>
-              <div className="p-2.5 rounded bg-[#f5f0e8] text-[11px] text-[#3d3d3a] border border-[#e6dfd8]">
+              <div className="p-2.5 rounded bg-surface-soft text-[11px] text-body border border-hairline">
                 <strong>Arbiter Verdict:</strong> Reconciled. Divergence Factor:{" "}
-                <code className="text-[#cc785c] font-mono">entity_scope: standalone vs consolidated</code>. The delta is
+                <code className="text-coral font-mono">entity_scope: standalone vs consolidated</code>. The delta is
                 fully accounted for by operating subsidiaries (Spoton Logistics and foreign branches).
               </div>
             </Card>
@@ -194,18 +194,18 @@ export default function CasesPage() {
               <Badge variant="dark" className="text-[11px] font-mono uppercase">
                 Case 4: Failure Auditing
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-ink">
                 Strict Ingestion Failure Diagnostics
               </h2>
             </div>
-            <p className="text-xs sm:text-sm text-[#6c6a64] leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-claude leading-relaxed">
               In statutory compliance, failed extractions must never be discarded or hallucinated. FLAE captures
               table OCR faults and coordinate ambiguities directly in the immutable audit log.
             </p>
 
-            <Card variant="dark" className="p-5 font-mono text-xs text-[#faf9f5] space-y-2">
-              <div className="text-[11px] text-[#a09d96]">FailureAuditRecord.json</div>
-              <pre className="text-[#faf9f5] text-[11px] leading-relaxed">
+            <Card variant="dark" className="p-5 font-mono text-xs text-canvas space-y-2">
+              <div className="text-[11px] text-on-dark-soft">FailureAuditRecord.json</div>
+              <pre className="text-canvas text-[11px] leading-relaxed">
 {`{
   "document_id": "b0f6d2f1-451e-461c-80b4-6170bee3543f",
   "status": "failed_extraction",

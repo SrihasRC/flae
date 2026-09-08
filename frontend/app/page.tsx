@@ -9,7 +9,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-32">
+      <section className="relative overflow-hidden pt-12 pb-20 md:pt-8 md:pb-32">
         {/* Subtle background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-foreground/[0.02] dark:bg-foreground/[0.04] blur-3xl rounded-full pointer-events-none -z-10" />
 
@@ -75,16 +75,16 @@ export default function LandingPage() {
       </section>
 
       {/* Feature & Architecture Pillars Section */}
-      <section id="architecture" className="py-16 md:py-24 bg-[#faf9f5] border-t border-[#e6dfd8]">
+      <section id="architecture" className="py-16 md:py-24 bg-canvas border-t border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Core Capabilities
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#141413]">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
               Engineered for Auditability, Traceability &amp; Rigor
             </h2>
-            <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
+            <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
               Generic LLM summarizers hallucinate when corporate reports disagree. FLAE enforces
               strict epistemic bounds before comparing claims.
             </p>
@@ -93,11 +93,11 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: Fact Extraction */}
             <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
-                <FileText className="h-4 w-4 text-[#cc785c]" />
+              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <FileText className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-[#141413]">Atomic Fact Ledger</h3>
-              <p className="text-xs text-[#6c6a64] leading-relaxed">
+              <h3 className="text-base font-semibold text-ink">Atomic Fact Ledger</h3>
+              <p className="text-xs text-muted-claude leading-relaxed">
                 Decomposes complex corporate disclosures into discrete, typed claims with numerical
                 normalization, raw strings, units, and verbatim paragraph excerpts.
               </p>
@@ -105,11 +105,11 @@ export default function LandingPage() {
 
             {/* Card 2: Context Envelope */}
             <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
-                <Sparkles className="h-4 w-4 text-[#cc785c]" />
+              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <Sparkles className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-[#141413]">6-D Context Envelopes</h3>
-              <p className="text-xs text-[#6c6a64] leading-relaxed">
+              <h3 className="text-base font-semibold text-ink">6-D Context Envelopes</h3>
+              <p className="text-xs text-muted-claude leading-relaxed">
                 Prevents false conflicts by explicitly binding claims to temporal periods, statutory
                 accounting rules, and organizational scope (Standalone vs Consolidated).
               </p>
@@ -117,11 +117,11 @@ export default function LandingPage() {
 
             {/* Card 3: Arbitration Engine */}
             <Card variant="cream" className="p-6 space-y-2.5">
-              <div className="h-8 w-8 rounded-lg bg-[#f5f0e8] border border-[#e6dfd8] flex items-center justify-center mb-1">
-                <Scale className="h-4 w-4 text-[#cc785c]" />
+              <div className="h-8 w-8 rounded-lg bg-surface-soft border border-hairline flex items-center justify-center mb-1">
+                <Scale className="h-4 w-4 text-coral" />
               </div>
-              <h3 className="text-base font-semibold text-[#141413]">Epistemic Arbiter</h3>
-              <p className="text-xs text-[#6c6a64] leading-relaxed">
+              <h3 className="text-base font-semibold text-ink">Epistemic Arbiter</h3>
+              <p className="text-xs text-muted-claude leading-relaxed">
                 Pairwise semantic matching classifies claims into Corroborated, Contradicted, or
                 Reconciled with comprehensive step-by-step reasoning traces.
               </p>
@@ -144,16 +144,16 @@ export default function LandingPage() {
       </section>
 
       {/* Epistemic Showcase Section */}
-      <section id="cases" className="py-16 md:py-24 border-t border-[#e6dfd8] bg-[#f5f0e8]/50">
+      <section id="cases" className="py-16 md:py-24 border-t border-hairline bg-surface-soft/50">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center mb-12">
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Case Study Explorer
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#141413]">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-ink">
               Demonstrated on Delhivery Limited Filings
             </h2>
-            <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
+            <p className="mt-3 text-sm text-muted-claude max-w-2xl leading-relaxed">
               Inspect how the engine processes real-world filings including the FY24 Annual Report
               and Q4 FY24 Earnings Presentation.
             </p>
@@ -162,14 +162,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card variant="canvas" className="p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-sm text-[#141413]">
+                <span className="font-semibold text-sm text-ink">
                   Case 1 &amp; 2: Corroboration &amp; Contradiction
                 </span>
                 <Badge variant="teal" className="text-[10px] font-mono">
                   Verified
                 </Badge>
               </div>
-              <p className="text-xs text-[#6c6a64] leading-relaxed">
+              <p className="text-xs text-muted-claude leading-relaxed">
                 Identifies claims that corroborate identically across filings (e.g. shipment volume,
                 network scale) and surfaces genuine contradictions (e.g. board member counts or
                 conflicting revisions) with juxtaposed quote excerpts.
@@ -178,14 +178,14 @@ export default function LandingPage() {
 
             <Card variant="canvas" className="p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-sm text-[#141413]">
+                <span className="font-semibold text-sm text-ink">
                   Case 3: Epistemic Reconciliation
                 </span>
                 <Badge variant="amber" className="text-[10px] font-mono">
                   Context Aware
                 </Badge>
               </div>
-              <p className="text-xs text-[#6c6a64] leading-relaxed">
+              <p className="text-xs text-muted-claude leading-relaxed">
                 Resolves apparent discrepancies such as Standalone Revenue (₹74,540 M) versus
                 Consolidated Revenue (₹81,415 M) by demonstrating that organizational boundary divergence
                 explains the mathematical delta.
@@ -217,12 +217,12 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#e6dfd8] py-8 text-center text-xs text-[#6c6a64] bg-[#faf9f5]">
+      <footer className="border-t border-hairline py-8 text-center text-xs text-muted-claude bg-canvas">
         <div className="container mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-serif font-semibold text-sm text-[#141413]">
+          <span className="font-serif font-semibold text-sm text-ink">
             FLAE — Epistemic Truth Discovery &amp; Fact Arbitration
           </span>
-          <span className="font-mono text-[11px] text-[#8e8b82]">
+          <span className="font-mono text-[11px] text-muted-soft">
             Enterprise Dossier Protocol • Deterministic Audit Engine
           </span>
         </div>

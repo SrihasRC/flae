@@ -7,19 +7,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#cc785c] text-white hover:bg-[#a9583e] active:bg-[#a9583e]",
+        default: "bg-coral text-white hover:bg-coral-active active:bg-coral-active",
         outline:
-          "border-[#e6dfd8] bg-[#faf9f5] text-[#141413] hover:bg-[#f5f0e8] hover:text-[#141413] dark:border-[#2e2b27] dark:bg-[#181715] dark:text-[#faf9f5] dark:hover:bg-[#252320]",
+          "border-hairline bg-canvas text-ink hover:bg-surface-soft hover:text-ink dark:border-border dark:bg-surface-dark dark:text-canvas dark:hover:bg-surface-dark-elevated",
         secondary:
-          "bg-[#faf9f5] text-[#141413] border border-[#e6dfd8] hover:bg-[#f5f0e8] active:bg-[#efe9de]",
+          "bg-canvas text-ink border border-hairline hover:bg-surface-soft active:bg-surface-card",
         ghost:
-          "hover:bg-[#efe9de] hover:text-[#141413] dark:hover:bg-[#252320] dark:hover:text-[#faf9f5]",
+          "hover:bg-surface-card hover:text-ink dark:hover:bg-surface-dark-elevated dark:hover:text-canvas",
         destructive:
-          "bg-[#c64545]/15 text-[#c64545] hover:bg-[#c64545]/25 focus-visible:border-[#c64545]/40",
-        link: "text-[#cc785c] underline-offset-4 hover:underline",
-        coral: "bg-[#cc785c] text-white hover:bg-[#a9583e] active:bg-[#a9583e]",
-        cream: "bg-[#efe9de] text-[#141413] border border-[#e6dfd8] hover:bg-[#e8e0d2]",
-        "secondary-on-dark": "bg-[#252320] text-[#faf9f5] border border-[#383530] hover:bg-[#2e2b27]",
+          "bg-destructive/15 text-destructive hover:bg-destructive/25 focus-visible:border-destructive/40",
+        link: "text-coral underline-offset-4 hover:underline",
+        coral: "bg-coral text-white hover:bg-coral-active active:bg-coral-active",
+        cream: "bg-surface-card text-ink border border-hairline hover:bg-surface-cream-strong",
+        "secondary-on-dark": "bg-surface-dark-elevated text-canvas border border-border hover:bg-surface-dark-soft",
       },
       size: {
         default:

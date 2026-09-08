@@ -8,21 +8,21 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#cc785c] text-white",
+        default: "bg-coral text-white",
         secondary:
-          "bg-[#f5f0e8] text-[#141413] border border-[#e6dfd8]",
+          "bg-surface-soft text-ink border border-hairline",
         destructive:
-          "bg-[#c64545]/15 text-[#c64545] border border-[#c64545]/30",
+          "bg-destructive/15 text-destructive border border-destructive/30",
         outline:
-          "border-[#e6dfd8] text-[#141413] bg-[#faf9f5]",
+          "border-hairline text-ink bg-canvas",
         ghost:
-          "hover:bg-[#efe9de] hover:text-[#141413]",
-        link: "text-[#cc785c] underline-offset-4 hover:underline",
-        pill: "bg-[#efe9de] text-[#141413] border border-[#e6dfd8]",
-        coral: "bg-[#cc785c] text-white",
-        dark: "bg-[#181715] text-[#faf9f5] border border-[#252320]",
-        teal: "bg-[#5db8a6]/15 text-[#2b7264] border border-[#5db8a6]/30",
-        amber: "bg-[#e8a55a]/15 text-[#9e5f1b] border border-[#e8a55a]/30",
+          "hover:bg-surface-card hover:text-ink",
+        link: "text-coral underline-offset-4 hover:underline",
+        pill: "bg-surface-card text-ink border border-hairline",
+        coral: "bg-coral text-white",
+        dark: "bg-surface-dark text-canvas border border-surface-dark-elevated",
+        teal: "bg-accent-teal/15 text-teal-800 dark:text-teal-300 border border-accent-teal/30",
+        amber: "bg-accent-amber/15 text-amber-800 dark:text-amber-300 border border-accent-amber/30",
       },
     },
     defaultVariants: {

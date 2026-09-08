@@ -31,7 +31,7 @@ function NavbarContent() {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-6xl transition-all duration-300">
-      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-[#e6dfd8] bg-[#faf9f5]/90 dark:bg-[#181715]/90 backdrop-blur-md shadow-xs">
+      <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-hairline bg-canvas/90 dark:bg-surface-dark/90 backdrop-blur-md shadow-xs">
         {isWorkspaceDetail ? (
           <>
             {/* Workspace Mode: Left side with Back button */}
@@ -40,7 +40,7 @@ function NavbarContent() {
                 href="/workspaces"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "h-8 px-2.5 text-xs font-medium gap-1.5 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                  "h-8 px-2.5 text-xs font-medium gap-1.5 text-muted-claude hover:text-ink dark:hover:text-canvas"
                 )}
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -49,7 +49,7 @@ function NavbarContent() {
               <div className="h-4 w-px bg-hairline hidden sm:block" />
               <div className="hidden sm:flex items-center gap-1.5">
                 <AnthropicRadialSpike className="h-3 w-3 text-coral" />
-                <span className="font-semibold text-xs tracking-tight text-[#141413] dark:text-[#faf9f5]">
+                <span className="font-semibold text-xs tracking-tight text-ink dark:text-canvas">
                   Dossier Console
                 </span>
                 <Badge variant="pill" className="text-[10px] py-0 px-1.5 font-mono">
@@ -64,8 +64,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=ledger`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "ledger"
-                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "bg-surface-card text-ink font-semibold dark:bg-surface-dark-elevated dark:text-canvas"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Fact Ledger
@@ -74,8 +74,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=arbitration`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "arbitration"
-                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "bg-surface-card text-ink font-semibold dark:bg-surface-dark-elevated dark:text-canvas"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Arbitration
@@ -84,8 +84,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=documents`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                   currentTab === "documents"
-                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "bg-surface-card text-ink font-semibold dark:bg-surface-dark-elevated dark:text-canvas"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Documents
@@ -94,8 +94,8 @@ function NavbarContent() {
                 href={`${pathname}?tab=query`}
                 className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors hidden sm:inline-block ${
                   currentTab === "query"
-                    ? "bg-[#efe9de] text-[#141413] font-semibold dark:bg-[#252320] dark:text-[#faf9f5]"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "bg-surface-card text-ink font-semibold dark:bg-surface-dark-elevated dark:text-canvas"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Query
@@ -111,7 +111,7 @@ function NavbarContent() {
                 aria-label="GitHub Repository"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-8 w-8 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                  "h-8 w-8 text-muted-claude hover:text-ink dark:hover:text-canvas"
                 )}
               >
                 <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={1.5} />
@@ -123,8 +123,8 @@ function NavbarContent() {
             {/* Normal Mode: Left side Logo */}
             <div className="flex items-center gap-2.5">
               <Link href="/" className="flex items-center gap-2">
-                <AnthropicRadialSpike className="h-4 w-4 text-[#cc785c]" />
-                <span className="font-extrabold text-sm tracking-tight text-[#141413] dark:text-[#faf9f5] font-mono">
+                <AnthropicRadialSpike className="h-4 w-4 text-coral" />
+                <span className="font-extrabold text-sm tracking-tight text-ink dark:text-canvas font-mono">
                   FLAE
                 </span>
               </Link>
@@ -136,8 +136,8 @@ function NavbarContent() {
                 href="/"
                 className={`text-xs font-medium transition-colors ${
                   pathname === "/"
-                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "text-ink dark:text-canvas font-semibold"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Overview
@@ -146,8 +146,8 @@ function NavbarContent() {
                 href="/workspaces"
                 className={`text-xs font-medium transition-colors ${
                   pathname.startsWith("/workspaces")
-                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "text-ink dark:text-canvas font-semibold"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Workspaces
@@ -156,8 +156,8 @@ function NavbarContent() {
                 href="/docs"
                 className={`text-xs font-medium transition-colors ${
                   pathname === "/docs"
-                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "text-ink dark:text-canvas font-semibold"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Architecture & Docs
@@ -166,8 +166,8 @@ function NavbarContent() {
                 href="/cases"
                 className={`text-xs font-medium transition-colors ${
                   pathname === "/cases"
-                    ? "text-[#141413] dark:text-[#faf9f5] font-semibold"
-                    : "text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                    ? "text-ink dark:text-canvas font-semibold"
+                    : "text-muted-claude hover:text-ink dark:hover:text-canvas"
                 }`}
               >
                 Case Studies
@@ -177,13 +177,13 @@ function NavbarContent() {
             {/* Normal Mode: Right side Actions */}
             <div className="flex items-center gap-2.5">
               <a
-                href="https://github.com"
+                href="https://github.com/SrihasRC/flae"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Repository"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-8 w-8 text-[#6c6a64] hover:text-[#141413] dark:hover:text-[#faf9f5]"
+                  "h-8 w-8 text-muted-claude hover:text-ink dark:hover:text-canvas"
                 )}
               >
                 <HugeiconsIcon icon={GithubIcon} size={18} strokeWidth={1.5} />
@@ -210,8 +210,8 @@ export function FloatingNavbar() {
     <Suspense
       fallback={
         <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-6xl">
-          <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-[#e6dfd8] bg-[#faf9f5]/90 backdrop-blur-md shadow-xs">
-            <span className="font-extrabold text-sm tracking-tight text-[#141413] font-mono">
+          <div className="flex items-center justify-between px-5 py-2.5 rounded-xl border border-hairline bg-canvas/90 backdrop-blur-md shadow-xs">
+            <span className="font-extrabold text-sm tracking-tight text-ink font-mono">
               FLAE
             </span>
           </div>

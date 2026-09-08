@@ -62,6 +62,10 @@
   --color-coral-active: #a9583e;
   --color-accent-teal: #5db8a6;
   --color-accent-amber: #e8a55a;
+  --color-accent-green: #5db872;
+  --color-muted-claude: #6c6a64;
+  --color-muted-soft: #8e8b82;
+  --color-on-dark-soft: #a09d96;
 }
 
 :root {

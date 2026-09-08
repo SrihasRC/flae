@@ -11,11 +11,11 @@ function Card({
   variant?: "default" | "cream" | "dark" | "coral" | "canvas";
 }) {
   const variantStyles = {
-    default: "bg-[#efe9de] text-[#141413] border border-[#e6dfd8]",
-    cream: "bg-[#efe9de] text-[#141413] border border-[#e6dfd8]",
-    dark: "bg-[#181715] text-[#faf9f5] border border-[#252320]",
-    coral: "bg-[#cc785c] text-white border-transparent",
-    canvas: "bg-[#faf9f5] text-[#141413] border border-[#e6dfd8]",
+    default: "bg-surface-card text-ink border border-hairline",
+    cream: "bg-surface-card text-ink border border-hairline",
+    dark: "bg-surface-dark text-canvas border border-surface-dark-elevated",
+    coral: "bg-coral text-white border-transparent",
+    canvas: "bg-canvas text-ink border border-hairline",
   };
 
   return (
