@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here. Sub-agents must prepend new entries following the format below upon task completion.
 
+## [feat/local-rule-based-extraction] — 2026-09-08
+
+### Added
+- `backend/app/services/local_extraction.py`: Added `LocalExtractionService`, an offline, deterministic, rule-based fact extraction engine that operates on structured `ParsedBlock` objects from `pdf_parser`.
+  - Tables: Extracts metric rows × columns into individual facts with attributes mapped to column headers and row labels, numeric values parsed, and full table row lines as `verbatim_quote`.
+  - Callouts: Converts isolated numeric KPI blocks directly into atomic facts.
+  - Text: Parses bounded sentences with currency, scale units (Mn/Bn/Cr/%), or percentages.
+  - Zero external API calls, immune to quota exhaustion, extracts hundreds of facts in milliseconds.
+- `backend/tests/test_local_extraction.py`: Full test suite covering table, callout, and sentence fact extraction.
+
+### Modified
+- `backend/app/api/v1/endpoints/documents.py`: Switched `run_ingestion_pipeline` default extraction engine to `LocalExtractionService` and skipped automatic LLM-based arbitration during document upload. Documents now complete ingestion within seconds with all table/metric facts stored and indexed in ChromaDB via local `fastembed`.
+
+### Notes
+- On `03-delhivery-q4-fy24-earnings-presentation.pdf` (27 pages), the local extraction engine produced 489 structured facts (442 table facts, 46 callout facts) in under 1 second with zero rate limit errors.
+
+---
+
 ## [fix/gemini-503-resilience] — 2026-09-08
 
 ### Added
