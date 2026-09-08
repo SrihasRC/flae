@@ -1,7 +1,7 @@
 from typing import Any, Optional
 import uuid
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.fact import Fact
@@ -77,6 +77,7 @@ class FactRepository:
         document_id: Optional[uuid.UUID | str] = None,
         subject: Optional[str] = None,
         attribute: Optional[str] = None,
+        query: Optional[str] = None,
     ) -> list[Fact]:
         """List facts for a workspace with pagination and optional filters."""
         ws_uid = self._to_uuid(workspace_id)
@@ -88,6 +89,15 @@ class FactRepository:
             stmt = stmt.where(Fact.subject.ilike(f"%{subject}%"))
         if attribute:
             stmt = stmt.where(Fact.attribute.ilike(f"%{attribute}%"))
+        if query and query.strip():
+            q_term = f"%{query.strip()}%"
+            stmt = stmt.where(
+                or_(
+                    Fact.subject.ilike(q_term),
+                    Fact.attribute.ilike(q_term),
+                    Fact.value_raw.ilike(q_term),
+                )
+            )
 
         stmt = stmt.offset(skip).limit(limit).order_by(Fact.created_at.desc())
         result = await self.db.execute(stmt)
@@ -106,6 +116,7 @@ class FactRepository:
         document_id: Optional[uuid.UUID | str] = None,
         subject: Optional[str] = None,
         attribute: Optional[str] = None,
+        query: Optional[str] = None,
     ) -> int:
         """Return total number of facts in a workspace matching optional filters."""
         ws_uid = self._to_uuid(workspace_id)
@@ -117,6 +128,15 @@ class FactRepository:
             stmt = stmt.where(Fact.subject.ilike(f"%{subject}%"))
         if attribute:
             stmt = stmt.where(Fact.attribute.ilike(f"%{attribute}%"))
+        if query and query.strip():
+            q_term = f"%{query.strip()}%"
+            stmt = stmt.where(
+                or_(
+                    Fact.subject.ilike(q_term),
+                    Fact.attribute.ilike(q_term),
+                    Fact.value_raw.ilike(q_term),
+                )
+            )
 
         result = await self.db.execute(stmt)
         count = result.scalar_one()

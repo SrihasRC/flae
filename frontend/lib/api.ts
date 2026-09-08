@@ -135,6 +135,7 @@ export interface FactFilterParams {
   document_id?: string;
   subject?: string;
   attribute?: string;
+  query?: string;
   skip?: number;
   limit?: number;
 }
@@ -147,6 +148,7 @@ export async function listFacts(
   if (params?.document_id) query.set("document_id", params.document_id);
   if (params?.subject) query.set("subject", params.subject);
   if (params?.attribute) query.set("attribute", params.attribute);
+  if (params?.query) query.set("query", params.query);
   if (params?.skip !== undefined) query.set("skip", params.skip.toString());
   if (params?.limit !== undefined) query.set("limit", params.limit.toString());
 

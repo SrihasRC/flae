@@ -33,6 +33,12 @@ async def list_facts(
     attribute: Optional[str] = Query(
         default=None, description="Case-insensitive substring filter on attribute"
     ),
+    query: Optional[str] = Query(
+        default=None, description="Search across subject, attribute, or raw value"
+    ),
+    q: Optional[str] = Query(
+        default=None, description="Alias for query parameter"
+    ),
     skip: int = Query(default=0, ge=0, description="Pagination offset"),
     limit: int = Query(default=50, ge=1, le=200, description="Max results per page"),
     workspace_repo: WorkspaceRepository = Depends(get_workspace_repo),
@@ -46,6 +52,8 @@ async def list_facts(
             detail=f"Workspace '{workspace_id}' not found",
         )
 
+    search_term = query or q
+
     facts = await fact_repo.list_by_workspace(
         workspace_id=workspace_id,
         skip=skip,
@@ -53,12 +61,14 @@ async def list_facts(
         document_id=document_id,
         subject=subject,
         attribute=attribute,
+        query=search_term,
     )
     total = await fact_repo.count_by_workspace(
         workspace_id=workspace_id,
         document_id=document_id,
         subject=subject,
         attribute=attribute,
+        query=search_term,
     )
 
     return FactListResponse(
