@@ -6,7 +6,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GithubIcon } from "@hugeicons/core-free-icons";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -46,16 +45,6 @@ function NavbarContent() {
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Workspaces</span>
               </Link>
-              <div className="h-4 w-px bg-hairline hidden sm:block" />
-              <div className="hidden sm:flex items-center gap-1.5">
-                <AnthropicRadialSpike className="h-3 w-3 text-coral" />
-                <span className="font-semibold text-xs tracking-tight text-ink dark:text-canvas">
-                  Dossier Console
-                </span>
-                <Badge variant="pill" className="text-[10px] py-0 px-1.5 font-mono">
-                  Live
-                </Badge>
-              </div>
             </div>
 
             {/* Workspace Mode: Center 3-4 links */}
@@ -105,7 +94,7 @@ function NavbarContent() {
             {/* Workspace Mode: Right side actions */}
             <div className="flex items-center gap-2">
               <a
-                href="https://github.com"
+                href="https://github.com/SrihasRC/flae"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub Repository"

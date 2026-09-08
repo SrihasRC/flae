@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatEvidenceQuote } from "@/lib/formatters";
 
 interface ArbitrationViewProps {
   workspaceId: string;
@@ -333,42 +334,42 @@ export function ArbitrationView({ workspaceId }: ArbitrationViewProps) {
 
               <CardContent className="p-4 space-y-4 text-xs">
                 {/* Evidence Comparison Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-lg bg-muted/40 border border-border/50 space-y-1.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0">
+                  <div className="p-3 rounded-lg bg-surface-soft/60 border border-hairline space-y-1.5 min-w-0">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-foreground uppercase tracking-wider text-[10px]">
+                      <span className="font-semibold text-ink uppercase tracking-wider text-[10px]">
                         Fact A Evidence
                       </span>
-                      <Badge variant="outline" className="text-[10px] font-mono">
+                      <Badge variant="outline" className="text-[10px] font-mono shrink-0">
                         Page {item.evidence_comparison?.fact_a_page}
                       </Badge>
                     </div>
-                    <blockquote className="italic text-foreground/90 leading-relaxed text-[11px]">
-                      &ldquo;{item.evidence_comparison?.fact_a_quote}&rdquo;
+                    <blockquote className="italic text-ink/90 leading-relaxed text-[11px] break-words">
+                      &ldquo;{formatEvidenceQuote(item.evidence_comparison?.fact_a_quote)}&rdquo;
                     </blockquote>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-muted/40 border border-border/50 space-y-1.5">
+                  <div className="p-3 rounded-lg bg-surface-soft/60 border border-hairline space-y-1.5 min-w-0">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-foreground uppercase tracking-wider text-[10px]">
+                      <span className="font-semibold text-ink uppercase tracking-wider text-[10px]">
                         Fact B Evidence
                       </span>
-                      <Badge variant="outline" className="text-[10px] font-mono">
+                      <Badge variant="outline" className="text-[10px] font-mono shrink-0">
                         Page {item.evidence_comparison?.fact_b_page}
                       </Badge>
                     </div>
-                    <blockquote className="italic text-foreground/90 leading-relaxed text-[11px]">
-                      &ldquo;{item.evidence_comparison?.fact_b_quote}&rdquo;
+                    <blockquote className="italic text-ink/90 leading-relaxed text-[11px] break-words">
+                      &ldquo;{formatEvidenceQuote(item.evidence_comparison?.fact_b_quote)}&rdquo;
                     </blockquote>
                   </div>
                 </div>
 
                 {/* Reasoning Trace */}
-                <div className="space-y-1 pt-1 border-t border-border/40">
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <div className="space-y-1 pt-1 border-t border-hairline/60 min-w-0">
+                  <span className="text-[10px] font-semibold text-muted-claude uppercase tracking-wider">
                     Arbiter Reasoning Trace
                   </span>
-                  <p className="text-xs text-foreground/90 leading-relaxed bg-muted/20 p-2.5 rounded-md border border-border/40">
+                  <p className="text-xs text-ink leading-relaxed bg-surface-soft/40 p-2.5 rounded-md border border-hairline/60 break-words">
                     {item.reasoning_trace}
                   </p>
                 </div>

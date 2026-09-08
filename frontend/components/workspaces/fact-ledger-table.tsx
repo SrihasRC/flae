@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cleanText, formatAttribute, formatValue } from "@/lib/formatters";
 import { FactDetailModal } from "./fact-detail-modal";
 
 interface FactLedgerTableProps {
@@ -130,9 +131,9 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
       </div>
 
       {/* Table container */}
-      <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
+      <div className="rounded-xl border border-hairline bg-canvas overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-muted-foreground">
+          <div className="p-12 text-center text-xs text-muted-claude">
             Loading facts from ledger...
           </div>
         ) : error ? (
@@ -140,71 +141,89 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
             {error}
           </div>
         ) : facts.length === 0 ? (
-          <div className="p-12 text-center text-xs text-muted-foreground">
+          <div className="p-12 text-center text-xs text-muted-claude">
             No facts found matching query or document filter.
           </div>
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/40 text-muted-foreground">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[180px] text-xs font-semibold">Subject</TableHead>
-                <TableHead className="w-[220px] text-xs font-semibold">Attribute</TableHead>
-                <TableHead className="w-[160px] text-xs font-semibold">Value</TableHead>
-                <TableHead className="text-xs font-semibold">Context Envelope</TableHead>
-                <TableHead className="w-[100px] text-xs font-semibold text-right">Evidence</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {facts.map((fact) => (
-                <TableRow
-                  key={fact.fact_id}
-                  className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => {
-                    setSelectedFact(fact);
-                    setDetailOpen(true);
-                  }}
-                >
-                  <TableCell className="font-medium text-xs text-foreground">
-                    {fact.subject}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground font-mono">
-                    <span className="line-clamp-2" title={fact.attribute}>
-                      {fact.attribute}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-xs font-mono font-medium text-foreground">
-                    <span className="line-clamp-2" title={fact.value_raw}>
-                      {fact.value_raw}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    <div className="flex flex-wrap items-center gap-1">
-                      {fact.context_envelope?.temporal_period && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                          {fact.context_envelope.temporal_period}
-                        </Badge>
-                      )}
-                      {fact.context_envelope?.entity_scope && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase">
-                          {fact.context_envelope.entity_scope}
-                        </Badge>
-                      )}
-                      {fact.context_envelope?.accounting_methodology && (
-                        <span className="text-[10px] text-muted-foreground font-mono">
-                          {fact.context_envelope.accounting_methodology.replace("reported_", "")}
-                        </span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right text-xs">
-                    <Badge variant="outline" className="text-[10px] font-mono">
-                      p. {fact.evidence?.page_number || "—"}
-                    </Badge>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table className="table-fixed w-full min-w-[700px]">
+              <TableHeader className="bg-surface-soft/60 text-muted-claude border-b border-hairline">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[18%] text-xs font-semibold text-ink">Subject</TableHead>
+                  <TableHead className="w-[32%] text-xs font-semibold text-ink">Attribute / Assertion</TableHead>
+                  <TableHead className="w-[22%] text-xs font-semibold text-ink">Extracted Value</TableHead>
+                  <TableHead className="w-[18%] text-xs font-semibold text-ink">Context Envelope</TableHead>
+                  <TableHead className="w-[10%] text-xs font-semibold text-ink text-right">Evidence</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {facts.map((fact) => {
+                  const cleanSubj = cleanText(fact.subject);
+                  const cleanAttr = formatAttribute(fact.attribute);
+                  const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);
+
+                  return (
+                    <TableRow
+                      key={fact.fact_id}
+                      className="cursor-pointer hover:bg-surface-soft/50 transition-colors border-b border-hairline/60"
+                      onClick={() => {
+                        setSelectedFact(fact);
+                        setDetailOpen(true);
+                      }}
+                    >
+                      <TableCell className="w-[18%] font-medium text-xs text-ink truncate" title={cleanSubj}>
+                        {cleanSubj}
+                      </TableCell>
+                      <TableCell className="w-[32%] text-xs text-muted-claude">
+                        <span className="line-clamp-2 break-words font-medium text-ink leading-snug" title={cleanAttr}>
+                          {cleanAttr}
+                        </span>
+                      </TableCell>
+                      <TableCell className="w-[22%] text-xs">
+                        <div className="space-y-0.5">
+                          <span className="font-bold font-mono text-xs text-ink block break-words">
+                            {formattedVal.primary}
+                          </span>
+                          {formattedVal.secondary && (
+                            <span
+                              className="text-[10px] font-mono text-muted-claude truncate block"
+                              title={formattedVal.secondary}
+                            >
+                              {formattedVal.secondary}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="w-[18%] text-xs">
+                        <div className="flex flex-wrap items-center gap-1">
+                          {fact.context_envelope?.temporal_period && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                              {fact.context_envelope.temporal_period}
+                            </Badge>
+                          )}
+                          {fact.context_envelope?.entity_scope && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase font-mono">
+                              {fact.context_envelope.entity_scope}
+                            </Badge>
+                          )}
+                          {fact.context_envelope?.accounting_methodology && (
+                            <span className="text-[10px] text-muted-claude font-mono">
+                              {fact.context_envelope.accounting_methodology.replace("reported_", "").toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="w-[10%] text-right text-xs">
+                        <Badge variant="outline" className="text-[10px] font-mono">
+                          p. {fact.evidence?.page_number || "—"}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </div>
 

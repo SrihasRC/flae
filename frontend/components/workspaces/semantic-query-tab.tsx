@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cleanText, formatAttribute, formatValue } from "@/lib/formatters";
 import { FactDetailModal } from "./fact-detail-modal";
 
 interface SemanticQueryTabProps {
@@ -118,45 +119,61 @@ export function SemanticQueryTab({ workspaceId }: SemanticQueryTabProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {results.map((fact) => (
-                <div
-                  key={fact.fact_id}
-                  onClick={() => {
-                    setSelectedFact(fact);
-                    setDetailOpen(true);
-                  }}
-                  className="p-3.5 rounded-xl border border-border/80 bg-card hover:bg-muted/30 cursor-pointer transition-colors space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-semibold text-xs text-foreground line-clamp-1">
-                      {fact.attribute}
-                    </span>
-                    <Badge variant="outline" className="text-[10px] font-mono shrink-0">
-                      p. {fact.evidence?.page_number || "—"}
-                    </Badge>
-                  </div>
+              {results.map((fact) => {
+                const cleanAttr = formatAttribute(fact.attribute);
+                const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);
+                const cleanSubj = cleanText(fact.subject);
 
-                  <div className="text-xs font-mono text-foreground font-semibold line-clamp-2">
-                    {fact.value_raw}
-                  </div>
+                return (
+                  <div
+                    key={fact.fact_id}
+                    onClick={() => {
+                      setSelectedFact(fact);
+                      setDetailOpen(true);
+                    }}
+                    className="p-3.5 rounded-xl border border-hairline bg-canvas hover:bg-surface-soft/60 cursor-pointer transition-colors space-y-2 min-w-0 overflow-hidden"
+                  >
+                    <div className="flex items-start justify-between gap-2 min-w-0">
+                      <span className="font-semibold text-xs text-ink line-clamp-2 break-words" title={cleanAttr}>
+                        {cleanAttr}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] font-mono shrink-0">
+                        p. {fact.evidence?.page_number || "—"}
+                      </Badge>
+                    </div>
 
-                  <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
-                    {fact.context_envelope?.temporal_period && (
-                      <Badge variant="secondary" className="px-1.5 py-0">
-                        {fact.context_envelope.temporal_period}
-                      </Badge>
-                    )}
-                    {fact.context_envelope?.entity_scope && (
-                      <Badge variant="outline" className="px-1.5 py-0 uppercase">
-                        {fact.context_envelope.entity_scope}
-                      </Badge>
-                    )}
-                    <span className="text-muted-foreground ml-auto">
-                      Subject: {fact.subject}
-                    </span>
+                    <div className="space-y-0.5 min-w-0">
+                      <span className="text-xs font-mono text-ink font-bold block break-words">
+                        {formattedVal.primary}
+                      </span>
+                      {formattedVal.secondary && (
+                        <span
+                          className="text-[10px] font-mono text-muted-claude truncate block"
+                          title={formattedVal.secondary}
+                        >
+                          {formattedVal.secondary}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] pt-1 border-t border-hairline/50">
+                      {fact.context_envelope?.temporal_period && (
+                        <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+                          {fact.context_envelope.temporal_period}
+                        </Badge>
+                      )}
+                      {fact.context_envelope?.entity_scope && (
+                        <Badge variant="outline" className="px-1.5 py-0 uppercase font-mono text-[10px]">
+                          {fact.context_envelope.entity_scope}
+                        </Badge>
+                      )}
+                      <span className="text-muted-claude ml-auto truncate" title={cleanSubj}>
+                        Subject: {cleanSubj}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
