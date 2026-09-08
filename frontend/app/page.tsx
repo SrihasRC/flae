@@ -11,7 +11,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-8 md:pb-32">
         {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-foreground/[0.02] dark:bg-foreground/[0.04] blur-3xl rounded-full pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-87.5 bg-foreground/2 dark:bg-foreground/4 blur-3xl rounded-full pointer-events-none -z-10" />
 
         <div className="container mx-auto max-w-5xl px-4 sm:px-6 flex flex-col items-center text-center">
           {/* Main Headline */}
