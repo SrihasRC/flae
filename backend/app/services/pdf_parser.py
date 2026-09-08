@@ -377,9 +377,8 @@ def parse_pdf(
                 fitz_page = doc[page_idx]
                 page_md = fitz_page.get_text("text")
 
-            # Check if page has minimal text (infographic, chart, slide)
-            if page_has_minimal_text(page_md):
-                visual_pages.append(page_num)
+            # Visual extraction path removed: all pages go through text extraction.
+            # page_has_minimal_text() and visual_pages are kept for API compat but unused.
 
             # Split markdown into logical chunks
             chunks = [c.strip() for c in re.split(r"\n\s*\n+", page_md) if c.strip()]

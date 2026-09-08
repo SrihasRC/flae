@@ -63,7 +63,7 @@ def validate_quote(quote: str, source_text: str) -> bool:
     if cleaned_quote in cleaned_source:
         return True
 
-    logger.warning(
+    logger.debug(
         "Quote validation failure (Case 4): Verbatim quote '%s' not found in source text",
         quote[:120],
     )
@@ -154,7 +154,7 @@ class ExtractionService:
     """Service for extracting atomic facts from structured document blocks using Gemini."""
 
     DEFAULT_MODEL = "gemini-3.8-flash"
-    BATCH_SIZE = 10
+    BATCH_SIZE = 30
     # Seconds to sleep between successive Gemini calls (text batches and visual pages).
     # Helps avoid exhausting free-tier RPM quota across all 3 keys simultaneously.
     INTER_CALL_DELAY_SECONDS: float = 0.5
@@ -207,15 +207,18 @@ class ExtractionService:
                 content = getattr(block, "content", "")
                 raw_markdown = getattr(block, "raw_markdown", "")
 
-            body = content if content else raw_markdown
+            # Use raw_markdown as the body sent to the LLM so verbatim quotes
+            # extracted by the model match the source text used for validation.
+            body = raw_markdown if raw_markdown else content
             block_descriptions.append(
                 f"--- Block {idx} (Page {page_num}, Type: {block_type}) ---\n{body}"
             )
 
-            if content:
-                source_texts.append(str(content))
+            # Include both cleaned content and raw markdown in source for validation
             if raw_markdown:
                 source_texts.append(str(raw_markdown))
+            if content:
+                source_texts.append(str(content))
 
         prompt = (
             "Extract all atomic facts explicitly stated in the following document blocks. "
@@ -419,17 +422,40 @@ class ExtractionService:
 
     @staticmethod
     def _find_grounding_page(quote: str, source_by_page: dict[int, str]) -> int | None:
-        """Find the one physical PDF page that contains a quoted source passage."""
-        matching_pages = [
-            page for page, source_text in source_by_page.items() if validate_quote(quote, source_text)
-        ]
-        if len(matching_pages) != 1:
-            logger.warning(
-                "Quote provenance failure (Case 4): quote matched %d pages; dropping fact",
-                len(matching_pages),
-            )
+        """Find the one physical PDF page that contains a quoted source passage.
+
+        Uses silent substring matching (no per-page log spam). Only logs once
+        if the quote cannot be grounded to exactly one page.
+        """
+        if not quote or not source_by_page:
             return None
-        return matching_pages[0]
+
+        norm_quote = re.sub(r"\s+", " ", quote).strip()
+        # Strip surrounding quotation marks the LLM may have added
+        if len(norm_quote) >= 2 and norm_quote[0] in ('"', "'") and norm_quote[0] == norm_quote[-1]:
+            norm_quote = norm_quote[1:-1].strip()
+        # Normalise smart quotes
+        for src, dst in (("\u201c", '"'), ("\u201d", '"'), ("\u2018", "'"), ("\u2019", "'")):
+            norm_quote = norm_quote.replace(src, dst)
+
+        matching_pages = []
+        for page, source_text in source_by_page.items():
+            norm_src = re.sub(r"\s+", " ", source_text)
+            for sq, ss in (("\u201c", '"'), ("\u201d", '"'), ("\u2018", "'"), ("\u2019", "'")):
+                norm_src = norm_src.replace(sq, ss)
+            if norm_quote in norm_src:
+                matching_pages.append(page)
+
+        if len(matching_pages) == 1:
+            return matching_pages[0]
+
+        # Log only once regardless of how many pages were checked
+        logger.debug(
+            "Quote provenance (Case 4): quote matched %d pages — dropping fact. Quote: %.80r",
+            len(matching_pages),
+            norm_quote,
+        )
+        return None
 
     async def extract_facts(
         self,
