@@ -18,6 +18,7 @@ import {
 } from "@/lib/formatters";
 import { ChevronDown, ChevronRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface FactDetailModalProps {
   fact: FactRead | null;
@@ -89,7 +90,14 @@ export function FactDetailModal({ fact, open, onOpenChange }: FactDetailModalPro
               )}
             </div>
 
-            <div className="text-2xl sm:text-3xl font-bold font-mono text-ink tracking-tight break-words">
+            <div
+              className={cn(
+                "text-ink tracking-tight break-words",
+                formattedVal.isNumeric
+                  ? "text-2xl sm:text-3xl font-bold font-mono"
+                  : "text-sm sm:text-base font-medium leading-relaxed font-sans"
+              )}
+            >
               {formattedVal.primary}
             </div>
 

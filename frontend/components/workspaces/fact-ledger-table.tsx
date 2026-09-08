@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { cleanText, formatAttribute, formatValue } from "@/lib/formatters";
 import { FactDetailModal } from "./fact-detail-modal";
+import { cn } from "@/lib/utils";
 
 interface FactLedgerTableProps {
   workspaceId: string;
@@ -160,66 +161,72 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
                 {facts.map((fact) => {
                   const cleanSubj = cleanText(fact.subject);
                   const cleanAttr = formatAttribute(fact.attribute);
-                  const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);
-
-                  return (
-                    <TableRow
-                      key={fact.fact_id}
-                      className="cursor-pointer hover:bg-surface-soft/50 transition-colors border-b border-hairline/60"
-                      onClick={() => {
-                        setSelectedFact(fact);
-                        setDetailOpen(true);
-                      }}
-                    >
-                      <TableCell className="w-[18%] font-medium text-xs text-ink truncate" title={cleanSubj}>
-                        {cleanSubj}
-                      </TableCell>
-                      <TableCell className="w-[32%] text-xs text-muted-claude">
-                        <span className="line-clamp-2 break-words font-medium text-ink leading-snug" title={cleanAttr}>
-                          {cleanAttr}
-                        </span>
-                      </TableCell>
-                      <TableCell className="w-[22%] text-xs">
-                        <div className="space-y-0.5">
-                          <span className="font-bold font-mono text-xs text-ink block break-words">
-                            {formattedVal.primary}
+                  const formattedVal = formatValue(fact.value_raw, fact.value_numeric, fact.unit);                    return (
+                      <TableRow
+                        key={fact.fact_id}
+                        className="cursor-pointer hover:bg-surface-soft/50 transition-colors border-b border-hairline/60"
+                        onClick={() => {
+                          setSelectedFact(fact);
+                          setDetailOpen(true);
+                        }}
+                      >
+                        <TableCell className="w-[18%] max-w-0 font-medium text-xs text-ink truncate" title={cleanSubj}>
+                          {cleanSubj}
+                        </TableCell>
+                        <TableCell className="w-[32%] max-w-0 text-xs text-muted-claude whitespace-normal overflow-hidden">
+                          <span className="line-clamp-2 break-words font-medium text-ink leading-snug" title={cleanAttr}>
+                            {cleanAttr}
                           </span>
-                          {formattedVal.secondary && (
+                        </TableCell>
+                        <TableCell className="w-[22%] max-w-0 text-xs whitespace-normal overflow-hidden">
+                          <div className="space-y-0.5 max-w-full overflow-hidden">
                             <span
-                              className="text-[10px] font-mono text-muted-claude truncate block"
-                              title={formattedVal.secondary}
+                              className={cn(
+                                "text-xs text-ink block break-words",
+                                formattedVal.isNumeric
+                                  ? "font-bold font-mono truncate"
+                                  : "font-medium line-clamp-2 leading-snug"
+                              )}
+                              title={formattedVal.primary}
                             >
-                              {formattedVal.secondary}
+                              {formattedVal.primary}
                             </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="w-[18%] text-xs">
-                        <div className="flex flex-wrap items-center gap-1">
-                          {fact.context_envelope?.temporal_period && (
-                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                              {fact.context_envelope.temporal_period}
-                            </Badge>
-                          )}
-                          {fact.context_envelope?.entity_scope && (
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase font-mono">
-                              {fact.context_envelope.entity_scope}
-                            </Badge>
-                          )}
-                          {fact.context_envelope?.accounting_methodology && (
-                            <span className="text-[10px] text-muted-claude font-mono">
-                              {fact.context_envelope.accounting_methodology.replace("reported_", "").toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="w-[10%] text-right text-xs">
-                        <Badge variant="outline" className="text-[10px] font-mono">
-                          p. {fact.evidence?.page_number || "—"}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  );
+                            {formattedVal.secondary && (
+                              <span
+                                className="text-[10px] font-mono text-muted-claude truncate block"
+                                title={formattedVal.secondary}
+                              >
+                                {formattedVal.secondary}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="w-[18%] max-w-0 text-xs whitespace-normal overflow-hidden">
+                          <div className="flex flex-wrap items-center gap-1 overflow-hidden">
+                            {fact.context_envelope?.temporal_period && (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 truncate max-w-full">
+                                {fact.context_envelope.temporal_period}
+                              </Badge>
+                            )}
+                            {fact.context_envelope?.entity_scope && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase font-mono truncate max-w-full">
+                                {fact.context_envelope.entity_scope}
+                              </Badge>
+                            )}
+                            {fact.context_envelope?.accounting_methodology && (
+                              <span className="text-[10px] text-muted-claude font-mono truncate max-w-full">
+                                {fact.context_envelope.accounting_methodology.replace("reported_", "").toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="w-[10%] text-right text-xs whitespace-nowrap">
+                          <Badge variant="outline" className="text-[10px] font-mono">
+                            p. {fact.evidence?.page_number || "—"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    );
                 })}
               </TableBody>
             </Table>
