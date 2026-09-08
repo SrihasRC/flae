@@ -32,12 +32,12 @@ class Fact(Base):
         index=True,
     )
     subject: Mapped[str] = mapped_column(
-        String(255),
+        Text,
         nullable=False,
         index=True,
     )
     attribute: Mapped[str] = mapped_column(
-        String(255),
+        Text,
         nullable=False,
         index=True,
     )

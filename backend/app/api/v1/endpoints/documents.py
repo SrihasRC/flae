@@ -76,6 +76,19 @@ async def run_ingestion_pipeline(
                     local_embedding_svc, local_vector_store, local_fact_repo
                 )
 
+                # Ensure document record exists before proceeding
+                doc = await local_doc_repo.get_by_id(document_id)
+                if doc is None:
+                    logger.warning("Document %s not found immediately in session; polling...", document_id)
+                    for _ in range(10):
+                        await asyncio.sleep(0.1)
+                        doc = await local_doc_repo.get_by_id(document_id)
+                        if doc is not None:
+                            break
+                    if doc is None:
+                        logger.error("Document %s not found in database; aborting pipeline", document_id)
+                        return
+
                 await local_doc_repo.update_status(document_id, "processing")
                 await session.commit()
 
@@ -293,6 +306,8 @@ async def upload_document(
             "facts_extracted": 0,
         }
     )
+    # Explicitly commit so background task running in an independent session can see the record
+    await document_repo.db.commit()
 
     # Dispatch ingestion pipeline to run in the background
     background_tasks.add_task(

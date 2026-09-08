@@ -93,11 +93,11 @@ def _facts_from_callout(block: Any, subject: str, document_id: str, workspace_id
     value_numeric, unit = _parse_numeric(text)
     temporal = _temporal(text)
     return [{
-        "subject": subject,
-        "attribute": text.strip(),
+        "subject": subject[:250],
+        "attribute": text.strip()[:250],
         "value_raw": text.strip(),
         "value_numeric": value_numeric,
-        "unit": unit,
+        "unit": unit[:50] if unit else None,
         "context_envelope": {
             "temporal_period": temporal,
             "period_type": "duration" if temporal else None,
@@ -179,11 +179,11 @@ def _facts_from_table(block: Any, subject: str, document_id: str, workspace_id: 
             verbatim_quote = data_line.strip()
 
             facts.append({
-                "subject": subject,
-                "attribute": attribute,
+                "subject": subject[:250],
+                "attribute": attribute[:250],
                 "value_raw": cell_val,
                 "value_numeric": value_numeric,
-                "unit": unit,
+                "unit": unit[:50] if unit else None,
                 "context_envelope": {
                     "temporal_period": temporal,
                     "period_type": "duration" if temporal else None,
@@ -242,11 +242,11 @@ def _facts_from_text(block: Any, subject: str, document_id: str, workspace_id: s
         temporal = _temporal(sent)
 
         facts.append({
-            "subject": subject,
-            "attribute": attribute,
+            "subject": subject[:250],
+            "attribute": attribute[:250],
             "value_raw": value_raw,
             "value_numeric": value_numeric,
-            "unit": unit,
+            "unit": unit[:50] if unit else None,
             "context_envelope": {
                 "temporal_period": temporal,
                 "period_type": "duration" if temporal else None,
