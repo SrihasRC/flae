@@ -8,16 +8,21 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        default: "bg-[#cc785c] text-white",
         secondary:
-          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+          "bg-[#f5f0e8] text-[#141413] border border-[#e6dfd8]",
         destructive:
-          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
+          "bg-[#c64545]/15 text-[#c64545] border border-[#c64545]/30",
         outline:
-          "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
+          "border-[#e6dfd8] text-[#141413] bg-[#faf9f5]",
         ghost:
-          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "hover:bg-[#efe9de] hover:text-[#141413]",
+        link: "text-[#cc785c] underline-offset-4 hover:underline",
+        pill: "bg-[#efe9de] text-[#141413] border border-[#e6dfd8]",
+        coral: "bg-[#cc785c] text-white",
+        dark: "bg-[#181715] text-[#faf9f5] border border-[#252320]",
+        teal: "bg-[#5db8a6]/15 text-[#2b7264] border border-[#5db8a6]/30",
+        amber: "bg-[#e8a55a]/15 text-[#9e5f1b] border border-[#e8a55a]/30",
       },
     },
     defaultVariants: {
