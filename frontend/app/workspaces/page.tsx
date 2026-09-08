@@ -75,9 +75,6 @@ export default function WorkspacesPage() {
             <Card className="border border-border/80 shadow-xs bg-card">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-[10px] font-mono">
-                    Starter Dataset Pre-loaded
-                  </Badge>
                   <span className="text-[11px] text-muted-foreground font-mono">
                     {delhiveryWs.document_count} Documents
                   </span>
@@ -107,53 +104,6 @@ export default function WorkspacesPage() {
               </CardContent>
             </Card>
           )}
-
-          {/* System Health Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="border border-border/70 shadow-xs">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Enterprise Core Engine
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-foreground">
-                  {health?.service || "fact-ledger-engine"}
-                </span>
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] border-emerald-500/30">
-                  {health?.status || "online"}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border/70 shadow-xs">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Immutable Audit Ledger
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-foreground">Atomic Ledger</span>
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] border-emerald-500/30">
-                  {health?.database || "connected"}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-border/70 shadow-xs">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Semantic Vector Index
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-foreground">Context Index</span>
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-[10px] border-emerald-500/30">
-                  {health?.vector_store || "connected"}
-                </Badge>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Workflow guide */}
           <div className="p-5 rounded-xl border border-border/70 bg-card space-y-3">
