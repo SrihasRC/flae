@@ -202,23 +202,35 @@ export function FactLedgerTable({ workspaceId, documents }: FactLedgerTableProps
                           </div>
                         </TableCell>
                         <TableCell className="w-[18%] max-w-0 text-xs whitespace-normal overflow-hidden">
-                          <div className="flex flex-wrap items-center gap-1 overflow-hidden">
-                            {fact.context_envelope?.temporal_period && (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 truncate max-w-full">
-                                {fact.context_envelope.temporal_period}
-                              </Badge>
-                            )}
-                            {fact.context_envelope?.entity_scope && (
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase font-mono truncate max-w-full">
-                                {fact.context_envelope.entity_scope}
-                              </Badge>
-                            )}
-                            {fact.context_envelope?.accounting_methodology && (
-                              <span className="text-[10px] text-muted-claude font-mono truncate max-w-full">
-                                {fact.context_envelope.accounting_methodology.replace("reported_", "").toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                          {fact.context_envelope?.temporal_period ||
+                          fact.context_envelope?.entity_scope ||
+                          fact.context_envelope?.accounting_methodology ||
+                          fact.context_envelope?.geography ? (
+                            <div className="flex flex-wrap items-center gap-1 overflow-hidden">
+                              {fact.context_envelope?.temporal_period && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 truncate max-w-full">
+                                  {fact.context_envelope.temporal_period}
+                                </Badge>
+                              )}
+                              {fact.context_envelope?.entity_scope && (
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 uppercase font-mono truncate max-w-full">
+                                  {fact.context_envelope.entity_scope}
+                                </Badge>
+                              )}
+                              {fact.context_envelope?.accounting_methodology && (
+                                <span className="text-[10px] text-muted-claude font-mono truncate max-w-full">
+                                  {fact.context_envelope.accounting_methodology.replace("reported_", "").toUpperCase()}
+                                </span>
+                              )}
+                              {fact.context_envelope?.geography && (
+                                <span className="text-[10px] text-muted-claude truncate max-w-full">
+                                  {fact.context_envelope.geography}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-muted-claude/50 font-mono pl-1">—</span>
+                          )}
                         </TableCell>
                         <TableCell className="w-[10%] text-right text-xs whitespace-nowrap">
                           <Badge variant="outline" className="text-[10px] font-mono">

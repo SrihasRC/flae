@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Numeric / unit patterns
 # ---------------------------------------------------------------------------
-_CURRENCY_RE = re.compile(r"[₹$€£]|Rs\.?|INR|USD", re.IGNORECASE)
+_CURRENCY_RE = re.compile(r"[₹$€£]|\b(?:Rs\.?|INR|USD)\b", re.IGNORECASE)
 _SCALE_RE = re.compile(r"\b(Mn|Bn|Cr|Crore|Crores|Lakh|Lakhs|Tons?|Tonnes?|Million|Billion|bps)\b", re.IGNORECASE)
 _PCT_RE = re.compile(r"\d+\.?\d*\s*%")
 _NUMBER_RE = re.compile(r"[-+]?[\d,]+\.?\d*")
@@ -33,7 +33,7 @@ _TEMPORAL_RE = re.compile(
 )
 # A "significant" numeric: has currency, scale unit, or percentage
 _SIGNIFICANT_RE = re.compile(
-    r"(?:[₹$€£]|Rs\.?|INR|USD|\bMn\b|\bBn\b|\bCr\b|\bLakh\b|\bTon|\b\d+\.?\d*\s*%)",
+    r"(?:[₹$€£]|\b(?:Rs\.?|INR|USD|Mn|Bn|Cr|Crore|Crores|Lakh|Lakhs|Tons?|Tonnes?|Million|Billion|bps)\b|\d+\.?\d*\s*%)",
     re.IGNORECASE,
 )
 
