@@ -14,7 +14,7 @@ export default function CasesPage() {
   return (
     <div className="flex flex-col min-h-screen bg-canvas">
       {/* Editorial Header */}
-      <section className="pt-12 pb-16 md:pt-16 md:pb-20 border-b border-hairline">
+      <section className="pt-28 pb-16 md:pt-32 md:pb-20 border-b border-hairline">
         <div className="container mx-auto max-w-5xl px-4 sm:px-6">
           <div className="flex flex-col items-start max-w-3xl">
             <Badge variant="pill" className="text-xs font-mono mb-3">

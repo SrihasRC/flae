@@ -10,7 +10,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 md:pt-8 md:pb-32">
+      <section className="relative overflow-hidden pt-28 pb-20 md:pt-36 md:pb-32">
         {/* Grainient background */}
         <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden opacity-60">
           <Grainient

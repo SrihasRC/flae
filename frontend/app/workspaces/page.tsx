@@ -44,7 +44,7 @@ export default function WorkspacesPage() {
   const delhiveryWs = workspaces.find((w) => w.name.toLowerCase().includes("delhivery"));
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-5rem)]">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20">
       {/* Left Sidebar in 'list' mode */}
       <WorkspaceSidebar
         mode="list"

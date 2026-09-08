@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-white font-sans">
         <TooltipProvider>
           <FloatingNavbar />
-          <div className="flex-1 flex flex-col pt-20">{children}</div>
+          <div className="flex-1 flex flex-col">{children}</div>
         </TooltipProvider>
       </body>
     </html>
