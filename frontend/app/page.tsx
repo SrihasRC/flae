@@ -81,7 +81,7 @@ export default function LandingPage() {
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Core Capabilities
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-[#141413]">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#141413]">
               Engineered for Auditability, Traceability &amp; Rigor
             </h2>
             <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
@@ -150,7 +150,7 @@ export default function LandingPage() {
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Case Study Explorer
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-[#141413]">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#141413]">
               Demonstrated on Delhivery Limited Filings
             </h2>
             <p className="mt-3 text-sm text-[#6c6a64] max-w-2xl leading-relaxed">
@@ -219,7 +219,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-[#e6dfd8] py-8 text-center text-xs text-[#6c6a64] bg-[#faf9f5]">
         <div className="container mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-serif text-sm text-[#141413]">
+          <span className="font-serif font-semibold text-sm text-[#141413]">
             FLAE — Epistemic Truth Discovery &amp; Fact Arbitration
           </span>
           <span className="font-mono text-[11px] text-[#8e8b82]">

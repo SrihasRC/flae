@@ -46,9 +46,9 @@ function NavbarContent() {
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Workspaces</span>
               </Link>
-              <div className="h-4 w-[1px] bg-[#e6dfd8] hidden sm:block" />
+              <div className="h-4 w-px bg-hairline hidden sm:block" />
               <div className="hidden sm:flex items-center gap-1.5">
-                <AnthropicRadialSpike className="h-3 w-3 text-[#cc785c]" />
+                <AnthropicRadialSpike className="h-3 w-3 text-coral" />
                 <span className="font-semibold text-xs tracking-tight text-[#141413] dark:text-[#faf9f5]">
                   Dossier Console
                 </span>
@@ -127,9 +127,6 @@ function NavbarContent() {
                 <span className="font-extrabold text-sm tracking-tight text-[#141413] dark:text-[#faf9f5] font-mono">
                   FLAE
                 </span>
-                <Badge variant="pill" className="text-[10px] py-0 px-1.5 font-mono">
-                  Enterprise
-                </Badge>
               </Link>
             </div>
 
@@ -179,10 +176,6 @@ function NavbarContent() {
 
             {/* Normal Mode: Right side Actions */}
             <div className="flex items-center gap-2.5">
-              <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#6c6a64] font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#5db872]" />
-                <span className="text-[11px]">Audit Engine Active</span>
-              </div>
               <a
                 href="https://github.com"
                 target="_blank"

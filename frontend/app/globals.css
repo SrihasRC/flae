@@ -141,4 +141,8 @@
   h1, h2, h3 {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+  .font-serif,
+  .font-display {
+    font-weight: 600;
+  }
 }

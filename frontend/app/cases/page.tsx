@@ -20,7 +20,7 @@ export default function CasesPage() {
             <Badge variant="pill" className="text-xs font-mono mb-3">
               Empirical Dossier Exhibits
             </Badge>
-            <h1 className="text-4xl sm:text-5xl font-serif tracking-tight text-[#141413] leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-[#141413] leading-tight">
               Case 1–4 Arbitration Showcase
             </h1>
             <p className="mt-4 text-base sm:text-lg text-[#3d3d3a] leading-relaxed">
@@ -52,7 +52,7 @@ export default function CasesPage() {
               <Badge variant="teal" className="text-[11px] font-mono uppercase">
                 Case 1: Corroborated
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
                 Direct Cross-Filing Verification
               </h2>
             </div>
@@ -99,7 +99,7 @@ export default function CasesPage() {
               <Badge variant="destructive" className="text-[11px] font-mono uppercase">
                 Case 2: Contradicted
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
                 Genuine Discrepancies &amp; Revisions
               </h2>
             </div>
@@ -146,7 +146,7 @@ export default function CasesPage() {
               <Badge variant="amber" className="text-[11px] font-mono uppercase">
                 Case 3: Reconciled
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
                 Scope &amp; Methodology Divergence (Standalone vs. Consolidated)
               </h2>
             </div>
@@ -194,7 +194,7 @@ export default function CasesPage() {
               <Badge variant="dark" className="text-[11px] font-mono uppercase">
                 Case 4: Failure Auditing
               </Badge>
-              <h2 className="text-xl sm:text-2xl font-serif text-[#141413]">
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold text-[#141413]">
                 Strict Ingestion Failure Diagnostics
               </h2>
             </div>

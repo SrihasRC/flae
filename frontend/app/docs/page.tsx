@@ -19,7 +19,7 @@ export default function DocsPage() {
             <Badge variant="pill" className="text-xs font-mono mb-3">
               System Architecture &amp; Specifications
             </Badge>
-            <h1 className="text-4xl sm:text-5xl font-serif tracking-tight text-[#141413] leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight text-[#141413] leading-tight">
               Deterministic Truth Discovery Architecture
             </h1>
             <p className="mt-4 text-base sm:text-lg text-[#3d3d3a] leading-relaxed">
@@ -38,7 +38,7 @@ export default function DocsPage() {
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#cc785c]" />
-              <h2 className="text-2xl sm:text-3xl font-serif text-[#141413]">
+              <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-[#141413]">
                 1. Four-Stage Epistemic Pipeline
               </h2>
             </div>
@@ -91,7 +91,7 @@ export default function DocsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-[#cc785c]" />
-                <h2 className="text-2xl sm:text-3xl font-serif text-[#141413]">
+                <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-[#141413]">
                   2. 6-Dimensional Context Envelope Specification
                 </h2>
               </div>
@@ -129,7 +129,7 @@ export default function DocsPage() {
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#cc785c]" />
-              <h2 className="text-2xl sm:text-3xl font-serif text-[#141413]">
+              <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-[#141413]">
                 3. Arbitration Decision Matrix
               </h2>
             </div>
@@ -173,7 +173,7 @@ export default function DocsPage() {
 
           {/* Section 4: Enterprise Audit Guarantee */}
           <div className="p-8 rounded-xl bg-[#cc785c] text-white space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-serif">
+            <h2 className="text-2xl sm:text-3xl font-serif font-semibold">
               100% Verbatim Auditability Guarantee
             </h2>
             <p className="text-xs sm:text-sm text-white/90 max-w-3xl leading-relaxed">
