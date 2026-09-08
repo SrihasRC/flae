@@ -4,6 +4,25 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [TASK-02] — 2026-09-08
+
+### Added
+- `backend/app/schemas/__init__.py`: Package initialization marker for domain schemas.
+- `backend/app/schemas/workspace.py`: Pydantic v2 models for workspace CRUD operations (`WorkspaceCreate`, `WorkspaceRead`, `WorkspaceListResponse`).
+- `backend/app/schemas/document.py`: Pydantic v2 models for document metadata, ingestion job status tracking, and upload responses (`DocumentRead`, `DocumentListResponse`, `IngestionJobStatus`, `DocumentUploadResponse`).
+- `backend/app/schemas/fact.py`: Canonical Atomic Fact schemas with context qualification envelopes and source evidence citations (`ContextEnvelope`, `Evidence`, `FactCreate`, `FactRead`, `FactListResponse`).
+- `backend/app/schemas/arbitration.py`: Cross-document fact arbitration models, evidence comparison, trigger requests, and Case 1–4 explorer schemas (`EvidenceComparison`, `ArbitrationRead`, `ArbitrationListResponse`, `ArbitrationTriggerRequest`, `ArbitrationTriggerResponse`, `CaseExplorerResponse`).
+
+### Modified
+- None
+
+### Notes
+- Pure Pydantic v2 models with `model_config = ConfigDict(from_attributes=True)` for seamless ORM integration.
+- Added pre-validators for enum fields (`period_type`, `entity_scope`, `accounting_methodology`, `relationship`, `status`) to normalize casing and whitespace from LLM extractions.
+- Built-in default fallback for `context_envelope` handling in `FactRead` and `FactCreate` to guarantee non-null envelope structure even when database column returns None.
+
+---
+
 ## [TASK-01] — 2026-09-08
 
 ### Added
