@@ -264,7 +264,61 @@ def _bind_footnotes_to_tables(page_blocks: list[ParsedBlock]) -> None:
             table.raw_markdown += footnotes_md
 
 
-def parse_pdf(file_bytes: bytes, filename: str = "") -> list[ParsedBlock]:
+_last_file_bytes: bytes | None = None
+_last_visual_pages: list[int] = []
+
+
+def page_has_minimal_text(page_markdown: str, threshold: int = 100) -> bool:
+    """Check if a page's markdown text content is below a minimal threshold.
+
+    Returns True if the page has fewer characters than threshold, indicating
+    it is likely an infographic, image slide, or visual diagram.
+
+    Args:
+        page_markdown: Markdown or text representation of the page.
+        threshold: Character count threshold (default 100).
+
+    Returns:
+        True if len(page_markdown.strip()) < threshold, False otherwise.
+    """
+    if not page_markdown:
+        return True
+    return len(page_markdown.strip()) < threshold
+
+
+def render_page_as_image(
+    file_bytes: bytes | None = None,
+    page_number: int = 1,
+) -> bytes:
+    """Render a specific PDF page as a PNG image at 2x resolution.
+
+    Args:
+        file_bytes: Raw bytes of the PDF file. If None, uses the last parsed PDF bytes.
+        page_number: 1-indexed page number to render.
+
+    Returns:
+        PNG image bytes.
+    """
+    global _last_file_bytes
+    data = file_bytes if file_bytes is not None else _last_file_bytes
+    if not data:
+        logger.warning("No PDF file bytes available to render page %d", page_number)
+        return b""
+
+    with fitz.open(stream=data, filetype="pdf") as doc:
+        if page_number < 1 or page_number > doc.page_count:
+            logger.warning(
+                "Page number %d out of range (1..%d)", page_number, doc.page_count
+            )
+            return b""
+        page = doc[page_number - 1]
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        return pixmap.tobytes("png")
+
+
+def parse_pdf(
+    file_bytes: bytes, filename: str = ""
+) -> tuple[list[ParsedBlock], list[int]]:
     """Parse a PDF document into a sequence of layout-aware ParsedBlocks.
 
     Args:
@@ -272,17 +326,29 @@ def parse_pdf(file_bytes: bytes, filename: str = "") -> list[ParsedBlock]:
         filename: Optional filename for logging and tracking.
 
     Returns:
-        List of ParsedBlock instances labeled with page_number and block_type.
+        Tuple of (all_blocks, visual_pages):
+        - all_blocks: List of ParsedBlock instances labeled with page_number and block_type.
+        - visual_pages: List of 1-indexed page numbers with minimal text (<100 chars)
+          that likely require visual/multimodal extraction fallback.
     """
+    global _last_file_bytes, _last_visual_pages
     if not file_bytes:
         logger.warning("Empty file bytes provided to parse_pdf: %s", filename)
-        return []
+        _last_file_bytes = None
+        _last_visual_pages = []
+        return [], []
 
+    _last_file_bytes = file_bytes
     all_blocks: list[ParsedBlock] = []
+    visual_pages: list[int] = []
 
-    with fitz.open(stream=file_bytes, filetype="pdf") as doc, pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+    with fitz.open(stream=file_bytes, filetype="pdf") as doc, pdfplumber.open(
+        io.BytesIO(file_bytes)
+    ) as pdf:
         total_pages = doc.page_count
-        logger.info("Starting PDF parsing for %s (%d pages)", filename or "unnamed", total_pages)
+        logger.info(
+            "Starting PDF parsing for %s (%d pages)", filename or "unnamed", total_pages
+        )
 
         for page_idx in range(total_pages):
             page_num = page_idx + 1
@@ -300,6 +366,10 @@ def parse_pdf(file_bytes: bytes, filename: str = "") -> list[ParsedBlock]:
                 )
                 fitz_page = doc[page_idx]
                 page_md = fitz_page.get_text("text")
+
+            # Check if page has minimal text (infographic, chart, slide)
+            if page_has_minimal_text(page_md):
+                visual_pages.append(page_num)
 
             # Split markdown into logical chunks
             chunks = [c.strip() for c in re.split(r"\n\s*\n+", page_md) if c.strip()]
@@ -343,12 +413,22 @@ def parse_pdf(file_bytes: bytes, filename: str = "") -> list[ParsedBlock]:
                                     )
                                 )
                 except Exception as e:
-                    logger.warning("pdfplumber table extraction failed on page %d: %s", page_num, e)
+                    logger.warning(
+                        "pdfplumber table extraction failed on page %d: %s",
+                        page_num,
+                        e,
+                    )
 
             # Bind footnotes to corresponding tables on this page
             _bind_footnotes_to_tables(page_blocks)
 
             all_blocks.extend(page_blocks)
 
-    logger.info("PDF parsing complete (%d blocks) for %s", len(all_blocks), filename or "unnamed")
-    return all_blocks
+    _last_visual_pages = list(visual_pages)
+    logger.info(
+        "PDF parsing complete (%d blocks, %d visual pages flagged) for %s",
+        len(all_blocks),
+        len(visual_pages),
+        filename or "unnamed",
+    )
+    return all_blocks, visual_pages

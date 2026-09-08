@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from app.core.config import settings
+from app.services.pdf_parser import render_page_as_image
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +135,20 @@ class ExtractedFact(BaseModel):
     )
 
 
+VISUAL_EXTRACTION_PROMPT = (
+    "Extract ALL numerical facts, data labels, chart values, callout metrics, and table data visible in this page image.\n"
+    "Return as a JSON array where each object strictly follows this schema:\n"
+    "- subject: entity, company, or metric subject (string)\n"
+    "- attribute: specific metric, dimension, or KPI name (string)\n"
+    "- value_raw: exact visible value string (string, e.g. '₹1,250 Cr', '45.2%')\n"
+    "- value_numeric: numeric float value if parseable, otherwise null\n"
+    "- unit: unit of measurement (string, e.g. 'INR Cr', '%', 'USD'), otherwise null\n"
+    "- context_envelope: object with temporal_period, period_type, entity_scope, geography, accounting_methodology, additional_qualifiers (all fields optional/null)\n"
+    "- evidence: object with verbatim_quote (the visible text label nearest to the value), page_number (the given page number), section_title (null)\n\n"
+    "Return ONLY the valid JSON array."
+)
+
+
 class ExtractionService:
     """Service for extracting atomic facts from structured document blocks using Gemini."""
 
@@ -233,34 +248,203 @@ class ExtractionService:
                 )
             raise
 
+    async def extract_facts_from_image(
+        self,
+        image_bytes: bytes,
+        page_number: int,
+        document_id: Any,
+        workspace_id: Any,
+    ) -> list[dict]:
+        """Extract facts from a page image using Gemini multimodal API."""
+        if not image_bytes:
+            return []
+
+        doc_id_str = str(document_id)
+        ws_id_str = str(workspace_id)
+
+        try:
+            image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/png")
+            text_part = types.Part.from_text(text=VISUAL_EXTRACTION_PROMPT)
+
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=[image_part, text_part],
+                config=types.GenerateContentConfig(response_mime_type="application/json"),
+            )
+            if inspect.isawaitable(response):
+                response = await response
+
+            raw_text = getattr(response, "text", None)
+            if raw_text is None:
+                if isinstance(response, (dict, list)):
+                    parsed_json = response
+                else:
+                    raw_text = str(response)
+                    parsed_json = None
+            else:
+                parsed_json = None
+
+            if parsed_json is None:
+                cleaned = raw_text.strip()
+                if cleaned.startswith("```"):
+                    cleaned = re.sub(r"^```(?:json)?\n?", "", cleaned)
+                    cleaned = re.sub(r"\n?```$", "", cleaned)
+                parsed_json = json.loads(cleaned)
+
+            if isinstance(parsed_json, dict):
+                if "facts" in parsed_json and isinstance(parsed_json["facts"], list):
+                    raw_facts = parsed_json["facts"]
+                else:
+                    raw_facts = [parsed_json]
+            elif isinstance(parsed_json, list):
+                raw_facts = parsed_json
+            else:
+                raw_facts = []
+
+            facts: list[dict] = []
+            for item in raw_facts:
+                if not isinstance(item, dict):
+                    continue
+
+                context_env = item.get("context_envelope") or {}
+                if not isinstance(context_env, dict):
+                    context_env = {}
+
+                evidence = item.get("evidence") or {}
+                if not isinstance(evidence, dict):
+                    evidence = {}
+
+                val_numeric = item.get("value_numeric")
+                if val_numeric is not None:
+                    try:
+                        val_numeric = float(val_numeric)
+                    except (ValueError, TypeError):
+                        val_numeric = None
+
+                quote = (
+                    evidence.get("verbatim_quote")
+                    or item.get("attribute")
+                    or item.get("value_raw")
+                    or ""
+                )
+
+                fact_dict: dict[str, Any] = {
+                    "subject": str(item.get("subject", "")),
+                    "attribute": str(item.get("attribute", "")),
+                    "value_raw": str(item.get("value_raw", "")),
+                    "value_numeric": val_numeric,
+                    "unit": item.get("unit"),
+                    "context_envelope": {
+                        "temporal_period": context_env.get("temporal_period"),
+                        "period_type": context_env.get("period_type"),
+                        "entity_scope": context_env.get("entity_scope"),
+                        "geography": context_env.get("geography"),
+                        "accounting_methodology": context_env.get(
+                            "accounting_methodology"
+                        ),
+                        "additional_qualifiers": context_env.get(
+                            "additional_qualifiers"
+                        ),
+                    },
+                    "evidence": {
+                        "verbatim_quote": str(quote),
+                        "page_number": page_number,
+                        "section_title": None,
+                    },
+                    "document_id": doc_id_str,
+                    "workspace_id": ws_id_str,
+                }
+                if "fact_id" in item and item["fact_id"]:
+                    fact_dict["fact_id"] = str(item["fact_id"])
+
+                facts.append(fact_dict)
+
+            logger.info(
+                "Visual fact extraction complete for page %d (%d facts)",
+                page_number,
+                len(facts),
+            )
+            return facts
+
+        except Exception as exc:
+            logger.warning(
+                "Visual fact extraction failed for page %d: %s",
+                page_number,
+                exc,
+            )
+            return []
+
     async def extract_facts(
         self,
-        blocks: list,
-        document_id: uuid.UUID,
-        workspace_id: uuid.UUID,
+        blocks: list | tuple,
+        document_id: uuid.UUID | str,
+        workspace_id: uuid.UUID | str,
+        visual_pages: list[int] | None = None,
+        file_bytes: bytes | None = None,
     ) -> list[dict]:
-        """Extract and validate atomic facts from a list of document blocks.
+        """Extract and validate atomic facts from document blocks or page images.
 
         Args:
-            blocks: List of objects or dicts with page_number, block_type, content, raw_markdown.
-            document_id: Source document UUID.
-            workspace_id: Target workspace UUID.
+            blocks: List of parsed blocks or tuple (blocks, visual_pages).
+            document_id: Source document UUID or string.
+            workspace_id: Target workspace UUID or string.
+            visual_pages: Optional list of 1-indexed page numbers flagged for vision extraction.
+            file_bytes: Optional raw PDF file bytes for rendering page images.
 
         Returns:
             List of validated atomic fact dictionaries ready for DB insertion.
         """
-        if not blocks:
-            logger.info("Fact extraction complete (0 facts)")
-            return []
+        # Handle tuple return from parse_pdf if passed directly as blocks
+        if isinstance(blocks, tuple) and len(blocks) == 2:
+            if visual_pages is None and isinstance(blocks[1], list):
+                visual_pages = blocks[1]
+            blocks = blocks[0]
 
         doc_id_str = str(document_id)
         ws_id_str = str(workspace_id)
         all_validated_facts: list[dict] = []
 
+        visual_set = set(visual_pages) if visual_pages else set()
+
+        # Visual extraction path: for pages in visual_pages, call extract_facts_from_image
+        if visual_pages:
+            for page_num in visual_pages:
+                try:
+                    img_bytes = render_page_as_image(file_bytes=file_bytes, page_number=page_num)
+                    if img_bytes:
+                        visual_facts = await self.extract_facts_from_image(
+                            image_bytes=img_bytes,
+                            page_number=page_num,
+                            document_id=doc_id_str,
+                            workspace_id=ws_id_str,
+                        )
+                        all_validated_facts.extend(visual_facts)
+                except Exception as exc:
+                    logger.warning(
+                        "Vision extraction fallback failed for page %d: %s",
+                        page_num,
+                        exc,
+                    )
+
+        # Text extraction path: skip blocks on visual pages
+        text_blocks = [
+            b
+            for b in (blocks or [])
+            if (
+                getattr(b, "page_number", None)
+                or (b.get("page_number") if isinstance(b, dict) else None)
+            )
+            not in visual_set
+        ]
+
+        if not text_blocks:
+            logger.info("Fact extraction complete (%d facts)", len(all_validated_facts))
+            return all_validated_facts
+
         # Group blocks into batches of up to 10 blocks
         batches = [
-            blocks[i : i + self.BATCH_SIZE]
-            for i in range(0, len(blocks), self.BATCH_SIZE)
+            text_blocks[i : i + self.BATCH_SIZE]
+            for i in range(0, len(text_blocks), self.BATCH_SIZE)
         ]
 
         for batch_idx, batch in enumerate(batches, start=1):
