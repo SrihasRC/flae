@@ -4,6 +4,21 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [TASK-09] — 2026-09-08
+
+### Added
+- None
+
+### Modified
+- `backend/app/main.py`: Replaced prototype entrypoint with production FastAPI application featuring an `asynccontextmanager` `lifespan` lifecycle (database schema initialization via `init_db()`, non-blocking ChromaDB connectivity check, automatic `uploads/` directory creation), API v1 router mounting at `/api/v1`, and an enhanced `/health` monitoring endpoint reporting database and vector store connectivity states.
+
+### Notes
+- ChromaDB connectivity probe in `lifespan` and `/health` runs non-blocking heartbeat checks with lazy imports to ensure application boot resilience even when vector store services are temporarily unreachable.
+- Database health check executes lightweight `SELECT 1` queries via isolated `AsyncSessionLocal` contexts.
+- All API v1 routes consolidated under `/api/v1` matching the `API_BLUEPRINT.md` specification.
+
+---
+
 ## [TASK-08] — 2026-09-08
 
 ### Added
