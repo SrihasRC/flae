@@ -1,0 +1,404 @@
+"""LLM-powered Atomic Fact Extraction Service using Gemini structured outputs."""
+
+import inspect
+import json
+import logging
+import re
+from typing import Any, Optional
+import uuid
+
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
+
+def validate_quote(quote: str, source_text: str) -> bool:
+    """Validate that verbatim_quote is a substring of source_text after whitespace normalization.
+
+    Args:
+        quote: Candidate verbatim quote string to verify.
+        source_text: Grounding source text against which the quote is matched.
+
+    Returns:
+        True if quote is found in source_text, False otherwise (logs Case 4 WARNING).
+    """
+    if not quote or not source_text:
+        logger.warning(
+            "Quote validation failure (Case 4): Empty quote or source text provided"
+        )
+        return False
+
+    norm_quote = re.sub(r"\s+", " ", quote).strip()
+    norm_source = re.sub(r"\s+", " ", source_text).strip()
+
+    # Strip accidental surrounding quotation marks added by LLM
+    if (norm_quote.startswith('"') and norm_quote.endswith('"')) or (
+        norm_quote.startswith("'") and norm_quote.endswith("'")
+    ):
+        norm_quote = norm_quote[1:-1].strip()
+
+    if norm_quote in norm_source:
+        return True
+
+    # Fallback check: normalize smart quotes and apostrophes
+    cleaned_quote = (
+        norm_quote.replace("“", '"')
+        .replace("”", '"')
+        .replace("’", "'")
+        .replace("‘", "'")
+    )
+    cleaned_source = (
+        norm_source.replace("“", '"')
+        .replace("”", '"')
+        .replace("’", "'")
+        .replace("‘", "'")
+    )
+    if cleaned_quote in cleaned_source:
+        return True
+
+    logger.warning(
+        "Quote validation failure (Case 4): Verbatim quote '%s' not found in source text",
+        quote[:120],
+    )
+    return False
+
+
+class ContextEnvelopeSchema(BaseModel):
+    """Context qualification envelope for structured fact extraction."""
+
+    temporal_period: Optional[str] = Field(
+        default=None,
+        description="Timeframe of the claim, e.g. 'FY2023-24' or 'Q3 FY24'",
+    )
+    period_type: Optional[str] = Field(
+        default=None,
+        description="'duration' for period spans or 'point_in_time' for snapshot dates",
+    )
+    entity_scope: Optional[str] = Field(
+        default=None,
+        description="Reporting perimeter, e.g. 'consolidated', 'standalone', 'subsidiary', 'cohort'",
+    )
+    geography: Optional[str] = Field(
+        default=None, description="Geographic jurisdiction or region, e.g. 'India'"
+    )
+    accounting_methodology: Optional[str] = Field(
+        default=None,
+        description="Accounting or statistical reporting methodology, e.g. 'reported_ind_as', 'pro_forma', 'actual'",
+    )
+    additional_qualifiers: Optional[str] = Field(
+        default=None,
+        description="Other qualifiers like currency denomination, audit status, etc.",
+    )
+
+
+class EvidenceSchema(BaseModel):
+    """Grounding evidence citation for structured fact extraction."""
+
+    verbatim_quote: str = Field(
+        ...,
+        description="Exact textual excerpt from the source text grounding this fact",
+    )
+    page_number: int = Field(
+        ..., description="Physical page number where the fact was cited"
+    )
+    section_title: Optional[str] = Field(
+        default=None, description="Section or table header containing the fact"
+    )
+
+
+class ExtractedFact(BaseModel):
+    """Schema representing an extracted atomic fact from Gemini structured output."""
+
+    subject: str = Field(..., description="Entity or topic of the claim")
+    attribute: str = Field(..., description="Property, metric, or relation measured")
+    value_raw: str = Field(
+        ..., description="Raw text value as reported in the document"
+    )
+    value_numeric: Optional[float] = Field(
+        default=None, description="Normalized numeric value as a float, or null"
+    )
+    unit: Optional[str] = Field(
+        default=None, description="Unit of measurement, or null"
+    )
+    context_envelope: ContextEnvelopeSchema = Field(
+        default_factory=ContextEnvelopeSchema,
+        description="Context qualification envelope",
+    )
+    evidence: EvidenceSchema = Field(
+        ..., description="Verbatim citation grounding the fact"
+    )
+
+
+class ExtractionService:
+    """Service for extracting atomic facts from structured document blocks using Gemini."""
+
+    DEFAULT_MODEL = "gemini-3.8-flash"
+    BATCH_SIZE = 10
+
+    SYSTEM_PROMPT = (
+        "You are an expert financial data analyst and information extraction system.\n"
+        "Your mission is to extract atomic facts explicitly stated in the provided text blocks.\n\n"
+        "Strict Guardrails:\n"
+        "1. Extract ONLY facts that are explicitly and directly stated in the text.\n"
+        "2. Require VERBATIM quotes: Every fact must have an exact, verbatim quote in evidence.verbatim_quote from the source text.\n"
+        "3. Do NOT infer, extrapolate, assume, or hallucinate values, numbers, dates, or scopes.\n"
+        "4. For numeric facts, extract the raw representation (value_raw) as well as the normalized numeric float value (value_numeric) and unit where available.\n"
+        "5. Accurately populate the context_envelope:\n"
+        "   - temporal_period: Explicit period or date (e.g., 'FY2023-24', 'Q3 FY24', 'As of March 31, 2024').\n"
+        "   - period_type: Either 'duration' (for time spans/periods) or 'point_in_time' (for snapshot dates/balance sheet dates).\n"
+        "   - entity_scope: Reporting perimeter (e.g., 'consolidated', 'standalone', 'subsidiary', 'cohort').\n"
+        "   - geography: Geographic jurisdiction or region (e.g., 'India', 'Global').\n"
+        "   - accounting_methodology: Standard used (e.g., 'reported_ind_as', 'pro_forma', 'actual', 'budget_estimate').\n"
+        "   - additional_qualifiers: Any extra qualifiers such as audited status, currency denomination, etc.\n"
+        "6. Return the extracted facts as a JSON array matching the requested schema."
+    )
+
+    def __init__(
+        self,
+        client: Optional[genai.Client] = None,
+        model: str = DEFAULT_MODEL,
+    ) -> None:
+        """Initialize the extraction service with a Gemini client."""
+        if client is not None:
+            self.client = client
+        else:
+            api_key = settings.GEMINI_API_KEY or "dummy-api-key"
+            self.client = genai.Client(api_key=api_key)
+        self.model = model
+
+    def _build_batch_prompt(self, batch: list) -> tuple[str, str]:
+        """Build the batch prompt and concatenated source text for quote verification."""
+        block_descriptions: list[str] = []
+        source_texts: list[str] = []
+
+        for idx, block in enumerate(batch, start=1):
+            if isinstance(block, dict):
+                page_num = block.get("page_number", 1)
+                block_type = block.get("block_type", "text")
+                content = block.get("content", "")
+                raw_markdown = block.get("raw_markdown", "")
+            else:
+                page_num = getattr(block, "page_number", 1)
+                block_type = getattr(block, "block_type", "text")
+                content = getattr(block, "content", "")
+                raw_markdown = getattr(block, "raw_markdown", "")
+
+            body = content if content else raw_markdown
+            block_descriptions.append(
+                f"--- Block {idx} (Page {page_num}, Type: {block_type}) ---\n{body}"
+            )
+
+            if content:
+                source_texts.append(str(content))
+            if raw_markdown:
+                source_texts.append(str(raw_markdown))
+
+        prompt = (
+            "Extract all atomic facts explicitly stated in the following document blocks. "
+            "Each fact must include an exact verbatim quote from the text.\n\n"
+            + "\n\n".join(block_descriptions)
+        )
+        combined_source = " ".join(source_texts)
+        return prompt, combined_source
+
+    @retry(
+        stop=stop_after_attempt(2),
+        wait=wait_exponential(multiplier=1, min=1, max=4),
+        retry=retry_if_exception_type((Exception,)),
+        reraise=True,
+    )
+    def _call_gemini_generate(
+        self,
+        prompt: str,
+        config: types.GenerateContentConfig,
+    ) -> Any:
+        """Invoke Gemini models.generate_content with retry logic."""
+        try:
+            return self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=config,
+            )
+        except TypeError as te:
+            if "config" in str(te) or "generation_config" in str(te):
+                return self.client.models.generate_content(
+                    model=self.model,
+                    contents=prompt,
+                    generation_config=config,
+                )
+            raise
+
+    async def extract_facts(
+        self,
+        blocks: list,
+        document_id: uuid.UUID,
+        workspace_id: uuid.UUID,
+    ) -> list[dict]:
+        """Extract and validate atomic facts from a list of document blocks.
+
+        Args:
+            blocks: List of objects or dicts with page_number, block_type, content, raw_markdown.
+            document_id: Source document UUID.
+            workspace_id: Target workspace UUID.
+
+        Returns:
+            List of validated atomic fact dictionaries ready for DB insertion.
+        """
+        if not blocks:
+            logger.info("Fact extraction complete (0 facts)")
+            return []
+
+        doc_id_str = str(document_id)
+        ws_id_str = str(workspace_id)
+        all_validated_facts: list[dict] = []
+
+        # Group blocks into batches of up to 10 blocks
+        batches = [
+            blocks[i : i + self.BATCH_SIZE]
+            for i in range(0, len(blocks), self.BATCH_SIZE)
+        ]
+
+        for batch_idx, batch in enumerate(batches, start=1):
+            prompt, batch_source_text = self._build_batch_prompt(batch)
+            if not batch_source_text.strip():
+                continue
+
+            config = types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=list[ExtractedFact],
+                system_instruction=self.SYSTEM_PROMPT,
+            )
+
+            try:
+                response = self._call_gemini_generate(prompt, config)
+                if inspect.isawaitable(response):
+                    response = await response
+            except Exception as exc:
+                logger.error(
+                    "Error calling Gemini API for batch %d: %s",
+                    batch_idx,
+                    exc,
+                )
+                continue
+
+            # Extract raw response text
+            raw_text = getattr(response, "text", None)
+            if raw_text is None:
+                if isinstance(response, (dict, list)):
+                    parsed_json = response
+                else:
+                    raw_text = str(response)
+                    parsed_json = None
+            else:
+                parsed_json = None
+
+            # Handle JSON parsing gracefully
+            if parsed_json is None:
+                try:
+                    parsed_json = json.loads(raw_text)
+                except json.JSONDecodeError as err:
+                    cleaned = raw_text.strip()
+                    if cleaned.startswith("```"):
+                        cleaned = re.sub(r"^```(?:json)?\n?", "", cleaned)
+                        cleaned = re.sub(r"\n?```$", "", cleaned)
+                        try:
+                            parsed_json = json.loads(cleaned)
+                        except json.JSONDecodeError:
+                            logger.error(
+                                "Failed to parse JSON from Gemini response for batch %d: %s",
+                                batch_idx,
+                                err,
+                            )
+                            continue
+                    else:
+                        logger.error(
+                            "Failed to parse JSON from Gemini response for batch %d: %s",
+                            batch_idx,
+                            err,
+                        )
+                        continue
+
+            # Normalize parsed JSON into a list of candidate fact dictionaries
+            if isinstance(parsed_json, list):
+                raw_facts = parsed_json
+            elif isinstance(parsed_json, dict):
+                if "facts" in parsed_json and isinstance(parsed_json["facts"], list):
+                    raw_facts = parsed_json["facts"]
+                else:
+                    raw_facts = [parsed_json]
+            else:
+                logger.error(
+                    "Unexpected JSON structure for batch %d: expected list or dict, got %s",
+                    batch_idx,
+                    type(parsed_json),
+                )
+                continue
+
+            # Validate each fact's verbatim quote against the batch source text
+            for item in raw_facts:
+                if not isinstance(item, dict):
+                    continue
+
+                evidence = item.get("evidence") or {}
+                if not isinstance(evidence, dict):
+                    evidence = {}
+                quote = str(evidence.get("verbatim_quote", ""))
+
+                if not validate_quote(quote, batch_source_text):
+                    continue
+
+                context_env = item.get("context_envelope") or {}
+                if not isinstance(context_env, dict):
+                    context_env = {}
+
+                val_numeric = item.get("value_numeric")
+                if val_numeric is not None:
+                    try:
+                        val_numeric = float(val_numeric)
+                    except (ValueError, TypeError):
+                        val_numeric = None
+
+                page_num = evidence.get("page_number", 1)
+                try:
+                    page_num = int(page_num)
+                except (ValueError, TypeError):
+                    page_num = 1
+
+                fact_dict: dict[str, Any] = {
+                    "subject": str(item.get("subject", "")),
+                    "attribute": str(item.get("attribute", "")),
+                    "value_raw": str(item.get("value_raw", "")),
+                    "value_numeric": val_numeric,
+                    "unit": item.get("unit"),
+                    "context_envelope": {
+                        "temporal_period": context_env.get("temporal_period"),
+                        "period_type": context_env.get("period_type"),
+                        "entity_scope": context_env.get("entity_scope"),
+                        "geography": context_env.get("geography"),
+                        "accounting_methodology": context_env.get(
+                            "accounting_methodology"
+                        ),
+                        "additional_qualifiers": context_env.get(
+                            "additional_qualifiers"
+                        ),
+                    },
+                    "evidence": {
+                        "verbatim_quote": quote,
+                        "page_number": page_num,
+                        "section_title": evidence.get("section_title"),
+                    },
+                    "document_id": doc_id_str,
+                    "workspace_id": ws_id_str,
+                }
+                if "fact_id" in item and item["fact_id"]:
+                    fact_dict["fact_id"] = str(item["fact_id"])
+
+                all_validated_facts.append(fact_dict)
+
+        logger.info("Fact extraction complete (%d facts)", len(all_validated_facts))
+        return all_validated_facts
