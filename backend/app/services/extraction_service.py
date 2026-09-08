@@ -267,15 +267,17 @@ class ExtractionService:
         doc_id_str = str(document_id)
         ws_id_str = str(workspace_id)
 
-        try:
+        def _call_visual() -> Any:
             image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/png")
             text_part = types.Part.from_text(text=VISUAL_EXTRACTION_PROMPT)
-
-            response = self._client_pool.generate_content(
+            return self._client_pool.generate_content(
                 model=self.model,
                 contents=[image_part, text_part],
                 config=types.GenerateContentConfig(response_mime_type="application/json"),
             )
+
+        try:
+            response = await asyncio.to_thread(_call_visual)
             if inspect.isawaitable(response):
                 response = await response
 
