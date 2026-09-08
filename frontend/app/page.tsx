@@ -4,14 +4,21 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Grainient from "@/components/Grainient";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-8 md:pb-32">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-87.5 bg-foreground/2 dark:bg-foreground/4 blur-3xl rounded-full pointer-events-none -z-10" />
+        {/* Grainient background */}
+        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden opacity-60">
+          <Grainient
+            color1="#FAF9F5"
+            color2="#CC785C"
+            color3="#EFE9DE"
+          />
+        </div>
 
         <div className="container mx-auto max-w-5xl px-4 sm:px-6 flex flex-col items-center text-center">
           {/* Main Headline */}
