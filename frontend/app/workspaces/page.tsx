@@ -64,8 +64,8 @@ export default function WorkspacesPage() {
               Select or Create a Workspace
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl">
-              Each workspace maintains an isolated fact ledger, ChromaDB semantic vector store, and
-              pairwise arbitration graph. Select an existing workspace from the sidebar or inspect the
+              Each workspace maintains an isolated fact ledger, high-dimensional semantic vector index,
+              and pairwise arbitration graph. Select an existing workspace from the sidebar or inspect the
               pre-loaded test dossier below.
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function WorkspacesPage() {
             <Card className="border border-border/70 shadow-xs">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  FastAPI Service
+                  Enterprise Core Engine
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
@@ -129,7 +129,7 @@ export default function WorkspacesPage() {
             <Card className="border border-border/70 shadow-xs">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Postgres / SQLite Database
+                  Immutable Audit Ledger
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
@@ -143,7 +143,7 @@ export default function WorkspacesPage() {
             <Card className="border border-border/70 shadow-xs">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  ChromaDB Vector Store
+                  Semantic Vector Index
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
