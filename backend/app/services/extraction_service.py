@@ -155,6 +155,9 @@ class ExtractionService:
 
     DEFAULT_MODEL = "gemini-3.8-flash"
     BATCH_SIZE = 10
+    # Seconds to sleep between successive Gemini calls (text batches and visual pages).
+    # Helps avoid exhausting free-tier RPM quota across all 3 keys simultaneously.
+    INTER_CALL_DELAY_SECONDS: float = 2.0
 
     SYSTEM_PROMPT = (
         "You are an expert financial data analyst and information extraction system.\n"
@@ -479,6 +482,9 @@ class ExtractionService:
                         page_num,
                         exc,
                     )
+                # Pace calls: avoid hitting all keys simultaneously across visual pages
+                if visual_pages and page_num != visual_pages[-1]:
+                    await asyncio.sleep(self.INTER_CALL_DELAY_SECONDS)
 
         # Text extraction path: skip blocks on visual pages
         text_blocks = [
@@ -522,6 +528,9 @@ class ExtractionService:
                     batch_idx,
                     exc,
                 )
+                # Still pace even on error to avoid rapid-fire retries from caller
+                if batch_idx < len(batches):
+                    await asyncio.sleep(self.INTER_CALL_DELAY_SECONDS)
                 continue
 
             # Extract raw response text
@@ -641,6 +650,10 @@ class ExtractionService:
                     fact_dict["fact_id"] = str(item["fact_id"])
 
                 all_validated_facts.append(fact_dict)
+
+            # Pace calls: give Gemini API time between batches to avoid RPM throttling
+            if batch_idx < len(batches):
+                await asyncio.sleep(self.INTER_CALL_DELAY_SECONDS)
 
         logger.info("Fact extraction complete (%d facts)", len(all_validated_facts))
         return all_validated_facts

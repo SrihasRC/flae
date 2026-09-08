@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. Sub-agents must prepend new entries following the format below upon task completion.
 
+## [fix/gemini-503-resilience] — 2026-09-08
+
+### Added
+- None
+
+### Modified
+- `backend/app/core/gemini.py`: Upgraded `GeminiClientPool._call()` from a single-pass key rotation to a **multi-round exponential backoff** strategy. When all configured keys return transient 503/429/5xx errors in one pass, the pool now waits a configurable inter-round delay (round 2: 5 s, round 3: 10 s) before cycling through all keys again, giving Gemini demand spikes time to subside. Added `_ROUND_WAIT_SECONDS` class-level schedule and imported `time`. Non-rotatable errors (400 INVALID_ARGUMENT, auth failures) still raise immediately without waiting.
+- `backend/app/services/extraction_service.py`: Added `INTER_CALL_DELAY_SECONDS = 2.0` class constant and three pacing `asyncio.sleep` calls — between successive visual-page extraction calls, between text batches after success, and between text batches after a recoverable error — to prevent simultaneous RPM exhaustion across all 3 free-tier keys.
+
+### Notes
+- Root cause of the observed 503 cascade: the original pool made a single pass through all 3 keys with zero delay between rotations. Under Gemini free-tier demand spikes all 3 keys return 503 within milliseconds of each other, exhausting the pool instantly.
+- The fix is backward-compatible: tests `test_pool_rotates_after_quota_error` and `test_pool_does_not_rotate_for_invalid_request` both continue to pass. A new manual validation confirmed that with 2 all-failing keys the pool correctly performs 3 rounds (0s, 5s, 10s waits) before re-raising.
+- All 12 API endpoints verified present in OpenAPI schema; all 7 regression tests pass.
+
+---
+
 ## [fix/dataset-provenance-audit] — 2026-09-08
 
 ### Added

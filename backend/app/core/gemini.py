@@ -1,6 +1,7 @@
 """Gemini client rotation for independently quota-limited API keys."""
 
 import logging
+import time
 from collections.abc import Callable
 from typing import Any, TypeVar
 
@@ -24,7 +25,18 @@ def _should_rotate_key(exc: Exception) -> bool:
 
 
 class GeminiClientPool:
-    """Use backup Gemini keys only for transient quota or service failures."""
+    """Use backup Gemini keys only for transient quota or service failures.
+
+    Rotation strategy:
+    - Round 1 (immediate): cycle through all keys with no inter-key delay.
+    - Round 2+: cycle through all keys again with exponential inter-round backoff
+      (5 s, 10 s) so that transient 503 "high demand" spikes can subside
+      before all keys are declared exhausted.
+    - Non-rotatable errors (auth failures, bad requests) raise immediately.
+    """
+
+    # Inter-round wait schedule in seconds: round 1 = no wait, round 2 = 5s, round 3 = 10s
+    _ROUND_WAIT_SECONDS: list[int] = [0, 5, 10]
 
     def __init__(
         self,
@@ -54,19 +66,44 @@ class GeminiClientPool:
         return self._call(lambda client: client.models.embed_content(**kwargs))
 
     def _call(self, operation: Callable[[genai.Client], T]) -> T:
+        """Execute *operation* with key rotation and multi-round exponential backoff.
+
+        Rounds are separated by an increasing sleep so Gemini demand spikes
+        have time to clear before all keys are declared exhausted.
+        """
+        n_keys = len(self._clients)
+        max_rounds = len(self._ROUND_WAIT_SECONDS)
         last_error: Exception | None = None
-        for attempt in range(len(self._clients)):
-            try:
-                return operation(self.client)
-            except Exception as exc:
-                last_error = exc
-                if not _should_rotate_key(exc) or attempt == len(self._clients) - 1:
-                    raise
-                previous_index = self._active_index
-                self._active_index = (self._active_index + 1) % len(self._clients)
+
+        for round_idx in range(max_rounds):
+            wait = self._ROUND_WAIT_SECONDS[round_idx]
+            if wait > 0:
                 logger.warning(
-                    "Gemini request received a transient error; switching from configured key %d to key %d",
-                    previous_index + 1,
-                    self._active_index + 1,
+                    "Gemini pool: all %d keys returned transient errors in round %d; "
+                    "waiting %ds before retry round %d",
+                    n_keys,
+                    round_idx,
+                    wait,
+                    round_idx + 1,
                 )
+                time.sleep(wait)
+
+            for attempt in range(n_keys):
+                try:
+                    return operation(self.client)
+                except Exception as exc:
+                    last_error = exc
+                    is_last_chance = (
+                        attempt == n_keys - 1 and round_idx == max_rounds - 1
+                    )
+                    if not _should_rotate_key(exc) or is_last_chance:
+                        raise
+                    previous_index = self._active_index
+                    self._active_index = (self._active_index + 1) % n_keys
+                    logger.warning(
+                        "Gemini request received a transient error; switching from configured key %d to key %d",
+                        previous_index + 1,
+                        self._active_index + 1,
+                    )
+
         raise RuntimeError("Gemini client pool exhausted") from last_error
