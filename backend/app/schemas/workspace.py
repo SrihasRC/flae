@@ -26,6 +26,9 @@ class WorkspaceRead(WorkspaceCreate):
     document_count: int = Field(
         default=0, ge=0, description="Count of documents ingested in this workspace"
     )
+    fact_count: int = Field(
+        default=0, ge=0, description="Count of atomic facts extracted in this workspace"
+    )
 
 
 class WorkspaceListResponse(BaseModel):

@@ -7,10 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.dependencies import (
     get_document_repo,
+    get_fact_repo,
     get_vector_store,
     get_workspace_repo,
 )
 from app.repositories.document_repository import DocumentRepository
+from app.repositories.fact_repository import FactRepository
 from app.repositories.workspace_repository import WorkspaceRepository
 from app.schemas.workspace import (
     WorkspaceCreate,
@@ -55,6 +57,7 @@ async def create_workspace(
         description=workspace.description,
         created_at=workspace.created_at,
         document_count=0,
+        fact_count=0,
     )
 
 
@@ -73,12 +76,14 @@ async def create_workspace(
 async def list_workspaces(
     workspace_repo: WorkspaceRepository = Depends(get_workspace_repo),
     document_repo: DocumentRepository = Depends(get_document_repo),
+    fact_repo: FactRepository = Depends(get_fact_repo),
 ) -> WorkspaceListResponse:
     """Retrieve all workspaces with their associated document counts."""
     workspaces = await workspace_repo.list_all()
     results: list[WorkspaceRead] = []
     for ws in workspaces:
         doc_count = await document_repo.count_by_workspace(ws.id)
+        fact_count = await fact_repo.count_by_workspace(ws.id)
         results.append(
             WorkspaceRead(
                 id=ws.id,
@@ -86,6 +91,7 @@ async def list_workspaces(
                 description=ws.description,
                 created_at=ws.created_at,
                 document_count=doc_count,
+                fact_count=fact_count,
             )
         )
     return WorkspaceListResponse(workspaces=results)
@@ -101,6 +107,7 @@ async def get_workspace(
     workspace_id: uuid.UUID,
     workspace_repo: WorkspaceRepository = Depends(get_workspace_repo),
     document_repo: DocumentRepository = Depends(get_document_repo),
+    fact_repo: FactRepository = Depends(get_fact_repo),
 ) -> WorkspaceRead:
     """Retrieve a single workspace by its unique identifier."""
     ws = await workspace_repo.get_by_id(workspace_id)
@@ -111,12 +118,14 @@ async def get_workspace(
         )
 
     doc_count = await document_repo.count_by_workspace(ws.id)
+    fact_count = await fact_repo.count_by_workspace(ws.id)
     return WorkspaceRead(
         id=ws.id,
         name=ws.name,
         description=ws.description,
         created_at=ws.created_at,
         document_count=doc_count,
+        fact_count=fact_count,
     )
 
 

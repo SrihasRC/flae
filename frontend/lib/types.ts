@@ -75,6 +75,7 @@ export interface Workspace {
   description?: string | null;
   created_at: string;
   document_count: number;
+  fact_count?: number;
 }
 
 export interface WorkspaceListResponse {
