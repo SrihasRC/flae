@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+from app.models.fact import Fact
+from app.models.workspace import Workspace
 
 
 class Arbitration(Base):

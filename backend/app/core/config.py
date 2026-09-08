@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     )
 
     DATABASE_URL: str = "postgresql+asyncpg://localhost:5432/fact_ledger"
+    GROQ_API_KEY: str = ""
+    ARBITRATION_MODEL: str = "groq/openai/gpt-oss-120b"
     GEMINI_API_KEY: str = ""
     GEMINI_API_KEY_2: str = Field(
         default="",

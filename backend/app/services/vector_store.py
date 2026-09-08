@@ -193,10 +193,11 @@ class VectorStoreService:
         if total_count == 0:
             return []
 
-        n_results = min(top_k, max(1, total_count))
+        # Overfetch so that neighbors from the excluded document do not push out cross-document matches
+        fetch_k = min(max(top_k * 4, 60), total_count)
         results = collection.query(
             query_embeddings=[embedding],  # type: ignore[list-item]
-            n_results=n_results,
+            n_results=fetch_k,
         )
 
         candidates: list[dict[str, Any]] = []
@@ -227,6 +228,8 @@ class VectorStoreService:
                     "score": score,
                     "metadata": meta,
                 })
+                if len(candidates) >= top_k:
+                    break
 
         return candidates
 
