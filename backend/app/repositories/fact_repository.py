@@ -90,14 +90,17 @@ class FactRepository:
         if attribute:
             stmt = stmt.where(Fact.attribute.ilike(f"%{attribute}%"))
         if query and query.strip():
-            q_term = f"%{query.strip()}%"
-            stmt = stmt.where(
-                or_(
-                    Fact.subject.ilike(q_term),
-                    Fact.attribute.ilike(q_term),
-                    Fact.value_raw.ilike(q_term),
-                )
-            )
+            terms = [t.strip() for t in query.split(",") if t.strip()]
+            if terms:
+                term_conditions = []
+                for term in terms:
+                    q_term = f"%{term}%"
+                    term_conditions.extend([
+                        Fact.subject.ilike(q_term),
+                        Fact.attribute.ilike(q_term),
+                        Fact.value_raw.ilike(q_term),
+                    ])
+                stmt = stmt.where(or_(*term_conditions))
 
         stmt = stmt.offset(skip).limit(limit).order_by(Fact.created_at.desc())
         result = await self.db.execute(stmt)
@@ -129,14 +132,17 @@ class FactRepository:
         if attribute:
             stmt = stmt.where(Fact.attribute.ilike(f"%{attribute}%"))
         if query and query.strip():
-            q_term = f"%{query.strip()}%"
-            stmt = stmt.where(
-                or_(
-                    Fact.subject.ilike(q_term),
-                    Fact.attribute.ilike(q_term),
-                    Fact.value_raw.ilike(q_term),
-                )
-            )
+            terms = [t.strip() for t in query.split(",") if t.strip()]
+            if terms:
+                term_conditions = []
+                for term in terms:
+                    q_term = f"%{term}%"
+                    term_conditions.extend([
+                        Fact.subject.ilike(q_term),
+                        Fact.attribute.ilike(q_term),
+                        Fact.value_raw.ilike(q_term),
+                    ])
+                stmt = stmt.where(or_(*term_conditions))
 
         result = await self.db.execute(stmt)
         count = result.scalar_one()
