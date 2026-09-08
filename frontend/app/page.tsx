@@ -10,7 +10,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-28 pb-20 md:pt-28 md:pb-16">
+      <section className="relative overflow-hidden pt-28 pb-20 md:pt-42 md:pb-38">
         {/* Grainient background */}
         <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden opacity-60">
           <Grainient
@@ -52,7 +52,7 @@ export default function LandingPage() {
           </div>
 
           {/* Metrics Strip */}
-          <div className="mt-8 w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 border-y border-white/80 py-8">
+          {/* <div className="mt-8 w-full grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 border-y border-white/80 py-8">
             <div className="flex flex-col items-center">
               <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-mono">
                 3,618+
@@ -77,7 +77,7 @@ export default function LandingPage() {
               </span>
               <span className="text-xs text-muted-foreground mt-1">Automated Arbitration</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 
