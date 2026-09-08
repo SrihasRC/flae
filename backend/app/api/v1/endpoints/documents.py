@@ -82,16 +82,21 @@ async def run_ingestion_pipeline(
                 file_bytes = Path(file_path).read_bytes()
 
                 # 2. Parse PDF
-                blocks = parse_pdf(file_bytes, Path(file_path).name)
+                blocks, visual_pages = parse_pdf(file_bytes, Path(file_path).name)
                 logger.info(
-                    "PDF parsing complete (%d blocks) for %s",
+                    "PDF parsing complete (%d blocks, %d visual pages) for %s",
                     len(blocks),
+                    len(visual_pages),
                     document_id,
                 )
 
                 # 3. Extract facts
                 facts = await local_extraction_svc.extract_facts(
-                    blocks, document_id, workspace_id
+                    blocks=blocks,
+                    document_id=document_id,
+                    workspace_id=workspace_id,
+                    visual_pages=visual_pages,
+                    file_bytes=file_bytes,
                 )
                 logger.info(
                     "Fact extraction complete (%d facts) for %s",
@@ -166,11 +171,22 @@ async def run_ingestion_pipeline(
         try:
             await doc_repo.update_status(document_id, "processing")
             file_bytes = Path(file_path).read_bytes()
-            blocks = parse_pdf(file_bytes, Path(file_path).name)
-            logger.info("PDF parsing complete (%d blocks)", len(blocks))
+            blocks, visual_pages = parse_pdf(file_bytes, Path(file_path).name)
+            logger.info(
+                "PDF parsing complete (%d blocks, %d visual pages) for %s",
+                len(blocks),
+                len(visual_pages),
+                document_id,
+            )
 
             local_ext = extraction_svc or ExtractionService()
-            facts = await local_ext.extract_facts(blocks, document_id, workspace_id)
+            facts = await local_ext.extract_facts(
+                blocks=blocks,
+                document_id=document_id,
+                workspace_id=workspace_id,
+                visual_pages=visual_pages,
+                file_bytes=file_bytes,
+            )
             logger.info("Fact extraction complete (%d facts)", len(facts))
 
             stored_facts = await fact_repo.create_bulk(facts)
