@@ -66,7 +66,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-12 pt-28 text-xs text-muted-foreground">
+      <div className="flex-1 flex items-center justify-center px-6 pb-12 pt-36 text-xs text-muted-foreground">
         Loading workspace dossier...
       </div>
     );
@@ -74,7 +74,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
 
   if (error || !workspace) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12 pt-28 space-y-3">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12 pt-36 space-y-3">
         <div className="text-sm font-semibold text-destructive">
           {error || "Workspace not found"}
         </div>
@@ -89,7 +89,7 @@ function WorkspaceDetailContent({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-20 p-4 lg:p-6 gap-6 bg-canvas">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-screen pt-28 sm:pt-32 lg:pt-32 px-4 sm:px-6 lg:px-8 pb-8 gap-6 bg-canvas">
       {/* Left Sidebar in 'active' mode */}
       <WorkspaceSidebar
         mode="active"
