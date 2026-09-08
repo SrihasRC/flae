@@ -4,6 +4,82 @@ All notable changes to this project are documented here. Sub-agents must prepend
 
 ---
 
+## [TASK-07] — 2026-09-08
+
+### Added
+- `backend/app/services/arbitration_service.py`: LLM-as-a-Judge arbitration engine adjudicating cross-document fact candidate pairs into CORROBORATED, CONTRADICTED, RECONCILED, or UNRELATED relationships with reasoning traces, evidence juxtaposition, candidate deduplication, and incremental cross-document arbitration.
+
+### Modified
+- None
+
+### Notes
+- Uses `google-genai` SDK version 2.22.0 (`genai.Client`) with model `gemini-3.8-flash`.
+- Employs structured output via `types.GenerateContentConfig` with `ArbitrationOutputSchema` ensuring strict compliance with the REST API and evaluation blueprint.
+- Implements single retry on malformed responses or API failures, falling back gracefully to `UNRELATED` with complete evidence preservation and zero system crashes.
+- Vector blocking integration uses `vector_store.query_candidates(workspace_id, embedding, exclude_document_id=...)` with default cosine threshold `0.82` and top-K `20`.
+- Fact candidate pairs are deduplicated using unordered `frozenset` keys across pairwise iterations to guarantee sub-quadratic execution and zero duplicate Arbiter invocations.
+- Incremental mode processes only facts from `new_document_id` against the existing cross-document workspace index.
+- Helper `_fact_to_dict` normalizes SQLAlchemy ORM objects, Pydantic models, and dictionaries for transparent repository interoperability.
+
+---
+
+## [TASK-04] — 2026-09-08
+
+### Added
+- `backend/app/services/__init__.py`: Package initialization marker for services module.
+- `backend/app/services/pdf_parser.py`: Layout-aware PDF ingestion service extracting structured `ParsedBlock` elements (`text`, `table`, `footnote`, `callout`) using `pymupdf4llm`, `pdfplumber`, and `fitz` with footnote binding and stat callout detection.
+
+### Modified
+- None
+
+### Notes
+- Uses `fitz` (pymupdf) for fast document metadata extraction (`page_count`, `title`, `author`).
+- Uses `pymupdf4llm.to_markdown(doc, pages=[i], use_ocr=False)` for high-fidelity markdown layout representation without OCR overhead.
+- Integrates `pdfplumber` for table detection, formatting non-redundant tabular blocks to markdown.
+- Detects financial stat callouts (isolated numeric/currency-heavy short text blocks < 20 words, such as `₹8,142 Cr` or `740 Mn`).
+- Detects bottom-of-page and post-table footnotes (`*`, `†`, `1.`, `2.`, `(1)`, `1/`, etc.) and binds them directly to corresponding table blocks on the same page.
+- Fully stateless with zero LLM or database dependencies; all operations performed in-memory from `bytes`.
+
+---
+
+## [TASK-06] — 2026-09-08
+
+### Added
+- `backend/app/services/__init__.py`: Package initialization marker for services module.
+- `backend/app/services/embedding_service.py`: Semantic embedding service using `google-genai` SDK (`gemini-embedding-2`) with anchor formatting (`subject | attribute`), batch processing (up to 100 anchors), and async support.
+- `backend/app/services/vector_store.py`: ChromaDB workspace-partitioned vector index manager with cosine similarity distance metric, candidate retrieval with cross-document filtering, document-level fact purging, and lazy client connection handling.
+
+### Modified
+- None
+
+### Notes
+- Uses `google-genai` version 2.22.0 (`genai.Client`) with model `gemini-embedding-2`.
+- Fact anchor representation is computed as `f"{subject} | {attribute}"`.
+- Embeddings are extracted from response via `.embeddings[0].values`.
+- `VectorStoreService` wraps `chromadb.HttpClient` initialization with lazy connection recovery to prevent import/startup crashes when the Chroma server is offline.
+- Metadata upserted to ChromaDB is automatically sanitized (coercing UUIDs to strings) for type compliance.
+- `query_candidates` supports bidirectional parameter ordering (`workspace_id` first or `embedding` first) for robust interoperability.
+
+---
+
+## [TASK-05] — 2026-09-08
+
+### Added
+- `backend/app/services/__init__.py`: Package initialization marker for backend domain services.
+- `backend/app/services/extraction_service.py`: LLM-powered atomic fact extraction service utilizing `google-genai` (version 2.22.0) with model `gemini-3.8-flash`, structured JSON outputs via Pydantic response schema, batching (up to 10 blocks), tenacity retries, and quote validation hallucination guard (`validate_quote`).
+
+### Modified
+- None
+
+### Notes
+- Extracted fact schemas conform precisely to canonical specification with `subject`, `attribute`, `value_raw`, `value_numeric`, `unit`, `context_envelope`, `evidence`, `document_id`, and `workspace_id`.
+- Implemented `validate_quote(quote, source_text)` with whitespace normalization and smart quote handling, raising Case 4 audit warnings on quote mismatch.
+- Extraction service gracefully handles malformed LLM responses with fallback logging and returns empty lists for failed batches without interrupting execution.
+- Added tenacity exponential backoff retry logic for LLM API calls.
+
+
+---
+
 ## [TASK-03] — 2026-09-08
 
 ### Added
