@@ -157,7 +157,7 @@ class ExtractionService:
     BATCH_SIZE = 10
     # Seconds to sleep between successive Gemini calls (text batches and visual pages).
     # Helps avoid exhausting free-tier RPM quota across all 3 keys simultaneously.
-    INTER_CALL_DELAY_SECONDS: float = 2.0
+    INTER_CALL_DELAY_SECONDS: float = 0.5
 
     SYSTEM_PROMPT = (
         "You are an expert financial data analyst and information extraction system.\n"
@@ -462,42 +462,21 @@ class ExtractionService:
         all_validated_facts: list[dict] = []
         source_by_page = self._source_text_by_page(list(blocks or []))
 
-        visual_set = set(visual_pages) if visual_pages else set()
-
-        # Visual extraction path: for pages in visual_pages, call extract_facts_from_image
+        # Visual extraction is intentionally skipped: chart/infographic pages flagged
+        # by the parser are already covered by their surrounding text blocks, and
+        # multimodal image calls on the free tier produce 503s far too frequently to
+        # be useful during bulk ingestion.  All blocks (including flagged visual
+        # pages) are processed by the text extraction path below.
         if visual_pages:
-            for page_num in visual_pages:
-                try:
-                    img_bytes = render_page_as_image(file_bytes=file_bytes, page_number=page_num)
-                    if img_bytes:
-                        visual_facts = await self.extract_facts_from_image(
-                            image_bytes=img_bytes,
-                            page_number=page_num,
-                            document_id=doc_id_str,
-                            workspace_id=ws_id_str,
-                            source_text=source_by_page.get(page_num, ""),
-                        )
-                        all_validated_facts.extend(visual_facts)
-                except Exception as exc:
-                    logger.warning(
-                        "Vision extraction fallback failed for page %d: %s",
-                        page_num,
-                        exc,
-                    )
-                # Pace calls: avoid hitting all keys simultaneously across visual pages
-                if visual_pages and page_num != visual_pages[-1]:
-                    await asyncio.sleep(self.INTER_CALL_DELAY_SECONDS)
-
-        # Text extraction path: skip blocks on visual pages
-        text_blocks = [
-            b
-            for b in (blocks or [])
-            if (
-                getattr(b, "page_number", None)
-                or (b.get("page_number") if isinstance(b, dict) else None)
+            logger.info(
+                "Skipping visual extraction for %d flagged page(s) %s — "
+                "covered by text blocks; avoids free-tier 503 storms",
+                len(visual_pages),
+                visual_pages,
             )
-            not in visual_set
-        ]
+
+        # Text extraction path: process ALL blocks (visual pages included)
+        text_blocks = list(blocks or [])
 
         if not text_blocks:
             logger.info("Fact extraction complete (%d facts)", len(all_validated_facts))
@@ -525,15 +504,26 @@ class ExtractionService:
                 if inspect.isawaitable(response):
                     response = await response
             except Exception as exc:
-                logger.error(
-                    "Error calling Gemini API for batch %d: %s",
+                logger.warning(
+                    "Gemini batch %d/%d failed (%s); sleeping 8s then retrying once",
                     batch_idx,
+                    len(batches),
                     exc,
                 )
-                # Still pace even on error to avoid rapid-fire retries from caller
-                if batch_idx < len(batches):
+                await asyncio.sleep(8.0)
+                try:
+                    response = await asyncio.to_thread(self._call_gemini_generate, prompt, config)
+                    if inspect.isawaitable(response):
+                        response = await response
+                except Exception as retry_exc:
+                    logger.error(
+                        "Gemini batch %d/%d failed after retry — skipping: %s",
+                        batch_idx,
+                        len(batches),
+                        retry_exc,
+                    )
                     await asyncio.sleep(self.INTER_CALL_DELAY_SECONDS)
-                continue
+                    continue
 
             # Extract raw response text
             raw_text = getattr(response, "text", None)
