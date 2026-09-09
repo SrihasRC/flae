@@ -1,6 +1,5 @@
 # FLAE — Fact Ledger & Arbitration Engine
 
-> **Deterministic Truth Discovery, Atomic Claim Grounding, and Multi-Document Arbitration for Financial Dossiers & Regulatory Filings.**
 
 [![Deployed Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel)](https://flae.srhsrc.dev/)
 [![Backend API](https://img.shields.io/badge/Backend-AWS%20EC2-orange?style=flat-square&logo=amazon-aws)](http://18.61.159.199:8000)
@@ -22,12 +21,7 @@
 
 ## 🎥 Video Demo
 
-- **Video Walkthrough (<= 3 min):** [Watch the Video Demo](https://flae.srhsrc.dev/demo) *(also accessible via the interactive demo button on the website)*
-- The demo demonstrates:
-  1. PDF upload and ingestion through the workspace UI.
-  2. Automatic table segmentation, layout parsing, and atomic fact extraction.
-  3. Context envelope binding (time, scope, standard).
-  4. Inspection of all **Four Required Cases** in the live Arbitration Explorer.
+- **Video Walkthrough :** [Watch the Video Demo](https://flae.srhsrc.dev/demo) 
 
 ---
 
@@ -162,7 +156,7 @@ FLAE was evaluated on real corporate filings (Delhivery Limited: Annual Report F
 
 ---
 
-## 🌟 Brownie Points & Scalability Architecture
+## 🌟 Scalability Architecture
 
 | Feature | Implementation in FLAE |
 | :--- | :--- |
@@ -307,4 +301,4 @@ fact-ledger-engine/
 
 ---
 
-*Built with ❤️ for Superjoin's Engineering Intern Hiring Assignment 2026.*
+
