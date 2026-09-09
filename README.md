@@ -13,9 +13,9 @@
 ## 🌐 Live Deployments
 
 - **Production Frontend (Vercel):** [https://flae.srhsrc.dev/](https://flae.srhsrc.dev/)
-- **Core Engine API (AWS EC2):** [http://18.61.159.199:8000](http://18.61.159.199)
-- **API Interactive Swagger Docs:** [http://18.61.159.199:8000/docs](http://18.61.159.199/docs)
-- **Engine Health Endpoint:** [http://18.61.159.199:8000/health](http://18.61.159.199/health)
+- **Core Engine API (AWS EC2):** [http://18.61.159.199](http://18.61.159.199)
+- **API Interactive Swagger Docs:** [http://18.61.159.199/docs](http://18.61.159.199/docs)
+- **Engine Health Endpoint:** [http://18.61.159.199/health](http://18.61.159.199/health)
 
 ---
 
@@ -271,33 +271,29 @@ fact-ledger-engine/
 │   │   ├── api.ts                  # Typed async API client with Next.js rewrite support
 │   │   └── formatters.ts           # Data cleaning & OCR artifact sanitization pipeline
 │   └── package.json
-├── starter-dataset/
-│   ├── delhivery/                  # Curated Delhivery Annual Report, Deck & Prospectus PDFs
-│   └── india-macroeconomy/         # Economic Survey & RBI Annual Report PDFs
 ├── arch_black.png                  # System architecture diagram (Dark theme)
 └── README.md
 ```
 
 ---
 
-## 🔮 Limitations & Next Steps
+## Limitations and Challenges Encountered
 
-1. **OCR on Complex Multi-Span Table Headers:**
-   - *Current Limitation:* In heavily merged balance sheet cells, multi-column span headers are flattened.
-   - *Next Step:* Integrate `Microsoft Table-Transformer` to reconstruct tabular row/column spans with spatial polygon coordinates before claim extraction.
-2. **Temporal Reasoning Graphs:**
-   - *Current Limitation:* Time comparisons rely on standardized ISO periods (`FY24`, `Q3`).
-   - *Next Step:* Build an Allen Interval Algebra graph engine to automatically compute temporal overlap across differing accounting calendars (e.g. Indian Fiscal Year April-March vs US Calendar Year January-December).
-3. **Automated Source PDF Highlighting:**
-   - *Current Limitation:* The UI provides exact verbatim text citations and page numbers.
-   - *Next Step:* Render an in-browser PDF viewport that automatically highlights the exact character bounding boxes (`x0, y0, x1, y1`) inside the source PDF upon clicking a fact.
+While FLAE successfully demonstrates the core mechanics of fact discovery, evidence grounding, and epistemic arbitration across multi-document corpuses, real-world deployment across large financial and macroeconomic filings revealed several practical bottlenecks:
 
----
+### 1. Multimodal Rate Limits & API Quotas on Large Filings
+* **The Challenge**: We initially designed a visual multimodal fallback pipeline using Gemini Flash to visually parse complex graphic callouts, slide infographics (e.g., Delhivery Earnings decks), and charts. However, running full multimodal vision across 100-page reports rapidly triggered free-tier API rate limits and token-per-minute (TPM) throttling.
+* **Current Mitigation**: To ensure predictable, deterministic, and self-contained execution without breaking during evaluations, we fell back to a hybrid layout parsing strategy combining `pymupdf4llm` (preserving markdown tables and structural hierarchies) and `pdfplumber`, supplemented by a local deterministic regex extractor and in-memory `fastembed` ONNX models.
+* **Next Steps**: Implement an asynchronous producer-consumer queue (e.g., Celery/Redis or BullMQ) with exponential backoff and batch image rendering, enabling progressive background ingestion for multimodal visual pages.
 
-## 📜 Additional Notes
+### 2. High-Density Numeric Extraction & Redundancy Overload
+* **The Challenge**: Because filings like Annual Reports and Economic Surveys repeat core financial metrics across multiple sections (e.g., revenue appearing on executive summary dashboards, narrative director reports, and consolidated balance sheets), the extractor frequently flags every numeric mention as an individual candidate fact. This can result in fact volume inflation and redundant intra-document corroborations.
+* **Current Mitigation**: The system utilizes semantic vector blocking over `{subject} | {attribute}` to focus arbitration queries primarily on cross-document pairs.
+* **Next Steps**: Introduce an intra-document deduplication and canonicalization stage prior to arbitration. This would merge identical intra-document figures into a single canonical fact node with multiple page references, filtering out noise and keeping the arbitration view focused on cross-document divergence.
 
-- **Data Privacy & Epistemic Traceability:** No client document data is cached externally. All embeddings and relational records remain inside self-hosted PostgreSQL and ChromaDB stores.
-- **Deterministic Fast-Paths:** When identical claims appear across multiple documents, the system bypasses costly LLM evaluation and uses deterministic cryptographic hashing, conserving API quotas while guaranteeing zero hallucination.
+### 3. Footnote & Annotation Attribution in Multi-Tier Tables
+* **The Challenge**: Complex financial tables often attach vital context (such as pro-forma disclaimers, restated periods, or inclusive workforce definitions) in tiny parenthetical footnotes at the base of the page. Lightweight text extraction can occasionally dissociate the footnote qualifier from the numeric cell.
+* **Next Steps**: Build table-aware bounding box association where footnote regions are explicitly mapped to superscript markers within the cell coordinates before LLM structured parsing.
 
 ---
 
