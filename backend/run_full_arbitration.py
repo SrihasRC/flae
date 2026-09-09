@@ -27,7 +27,16 @@ from app.services.arbitration_service import ArbitrationService, _fact_to_dict
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("arbitration_runner")
 
-WORKSPACE_ID = uuid.UUID("b097fafc-4e75-442d-8065-b4cee73091b9")
+# Determine workspace to arbitrate
+WORKSPACE_ID = uuid.UUID("95f70b45-efd6-416b-a60a-69531b54da64")
+if len(sys.argv) > 1:
+    arg = sys.argv[1].strip()
+    if arg == "delhivery":
+        WORKSPACE_ID = uuid.UUID("b097fafc-4e75-442d-8065-b4cee73091b9")
+    elif arg == "india-macroeconomy":
+        WORKSPACE_ID = uuid.UUID("95f70b45-efd6-416b-a60a-69531b54da64")
+    else:
+        WORKSPACE_ID = uuid.UUID(arg)
 
 async def main():
     async with AsyncSessionLocal() as session:
@@ -56,17 +65,19 @@ async def main():
         logger.info("Loaded %d existing arbitration records.", len(seen_pairs))
 
         # Run arbitration for workspace
-        target_new_pairs = 30
-        logger.info("Targeting up to %d high-quality cross-document pairs...", target_new_pairs)
+        target_new_pairs = 25
+        logger.info("Targeting up to %d high-quality cross-document pairs for workspace %s...", target_new_pairs, WORKSPACE_ID)
 
         facts = await fact_repo.list_by_workspace(WORKSPACE_ID, skip=0, limit=5000)
         logger.info("Loaded %d total facts in workspace.", len(facts))
 
-        # Prioritize facts with high epistemic value (financial, volumes, network reach, governance)
+        # Prioritize facts with high epistemic value (financial, volumes, network reach, macro indicators)
         kpi_terms = [
+            "gdp", "growth", "inflation", "cpi", "deficit", "fiscal", "cad", "current account",
+            "forex", "reserves", "fdi", "exports", "imports", "trade", "debt", "crar", "repo",
+            "banking", "rate", "fy24", "fy25", "2023-24", "2024-25",
             "revenue", "ebitda", "profit", "loss", "pat", "pbt", "expense", "margin",
-            "pin-code", "reach", "shares", "equity", "tonnage", "shipments", "parcel",
-            "truckload", "supply chain", "express", "may 17", "2024", "2022", "2023"
+            "pin-code", "reach", "shares", "equity", "tonnage", "shipments", "parcel"
         ]
         kpi_facts = [f for f in facts if any(term in f.attribute.lower() or term in f.value_raw.lower() for term in kpi_terms)]
         other_facts = [f for f in facts if f not in kpi_facts]
@@ -94,7 +105,7 @@ async def main():
                 embedding=emb,
                 exclude_document_id=doc_id,
                 top_k=5,
-                threshold=0.84,
+                threshold=0.78,
             )
 
             for cand in candidates:

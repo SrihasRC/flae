@@ -28,16 +28,16 @@ class ContextEnvelope(BaseModel):
     temporal_period: Optional[str] = Field(
         default=None, description="Timeframe of the claim, e.g. 'FY2023-24' or 'Q3 FY24'"
     )
-    period_type: Optional[PeriodType] = Field(
+    period_type: Optional[str] = Field(
         default=None, description="'duration' for period spans or 'point_in_time' for snapshot dates"
     )
-    entity_scope: Optional[EntityScope] = Field(
+    entity_scope: Optional[str] = Field(
         default=None, description="Reporting perimeter, e.g. consolidated or standalone"
     )
     geography: Optional[str] = Field(
         default=None, description="Geographic jurisdiction or region, e.g. 'India'"
     )
-    accounting_methodology: Optional[AccountingMethodology] = Field(
+    accounting_methodology: Optional[str] = Field(
         default=None, description="Accounting or statistical reporting methodology"
     )
     additional_qualifiers: Optional[str] = Field(
