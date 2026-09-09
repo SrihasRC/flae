@@ -14,7 +14,9 @@ import {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" ? "" : "http://localhost:8000");
+  (typeof window !== "undefined"
+    ? ""
+    : process.env.BACKEND_URL || "http://localhost:8000");
 
 async function request<T>(
   endpoint: string,
