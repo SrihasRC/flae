@@ -21,7 +21,7 @@
 
 ## 🎥 Video Demo
 
-- **Video Walkthrough :** [Watch the Video Demo](https://flae.srhsrc.dev/demo) 
+- **Video Walkthrough :** [Watch the Video Demo](https://www.youtube.com/watch?v=e5KIkOBG9FU) 
 
 ---
 
