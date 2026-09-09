@@ -13,9 +13,9 @@
 ## 🌐 Live Deployments
 
 - **Production Frontend (Vercel):** [https://flae.srhsrc.dev/](https://flae.srhsrc.dev/)
-- **Core Engine API (AWS EC2):** [http://18.61.159.199:8000](http://18.61.159.199:8000)
-- **API Interactive Swagger Docs:** [http://18.61.159.199:8000/docs](http://18.61.159.199:8000/docs)
-- **Engine Health Endpoint:** [http://18.61.159.199:8000/health](http://18.61.159.199:8000/health)
+- **Core Engine API (AWS EC2):** [http://18.61.159.199:8000](http://18.61.159.199)
+- **API Interactive Swagger Docs:** [http://18.61.159.199:8000/docs](http://18.61.159.199/docs)
+- **Engine Health Endpoint:** [http://18.61.159.199:8000/health](http://18.61.159.199/health)
 
 ---
 
