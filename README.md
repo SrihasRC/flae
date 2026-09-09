@@ -144,15 +144,17 @@ FLAE was evaluated on real corporate filings (Delhivery Limited: Annual Report F
 
 ---
 
-### Case 4: Extraction / Reasoning Failure & Handling
-*Analysis of a real-world document extraction challenge and how the system isolates failures.*
+### Case 4 Failure Mode Analysis: Heuristic Regex Fallback Artifacts
 
-- **The Failure Phenomenon:** In dense financial disclosures (e.g. Schedule of Key Managerial Remuneration and Note 34 Contingent Liabilities), financial tables contain multi-level hierarchical headers (e.g. *"Year ended March 31, 2024"* spanning three sub-columns: *"Salary"*, *"ESOP Options Granted"*, and *"Total"*). Standard LLM chunk extractors regularly flatten these columns, concatenating multiple numeric entries into a single string (e.g. `"105.19%<br>96,195.00<br>104.28%"`), losing the association between the metric and its unit.
-- **How FLAE Handles and Mitigates This:**
-  1. **Fail-Closed Type Enforcement:** Extracted facts must pass strict Pydantic validation (`value_numeric: float`, `unit: str`, `context_envelope`). Malformed OCR artifacts that fail parsing are rejected into the `Failure Audit Trail` instead of poisoning the active ledger.
-  2. **Verbatim Anchor Verification:** Every extracted claim requires a verbatim quotation and page coordinate. If the quote cannot be verified as an authentic continuous substring in the source document, the fact is disqualified.
-  3. **Multi-Value Splitting Parser:** The frontend data formatter ([`formatters.ts`](frontend/lib/formatters.ts)) detects multi-part OCR rows, isolates primary headline metrics from comparative sub-values, and strips residual HTML/Markdown noise into clean enterprise typography.
-- **Future Improvement:** Incorporating layout-aware bounding box transformers (e.g. Table Transformer / LayoutLMv3) to build structural AST trees of nested balance sheet grids prior to LLM extraction.
+1. **Failure Description**:
+   When processing dense narrative paragraphs and multi-column tables under local fallback mode, the heuristic parser exhibited three specific failure modes:
+   - **Greedy Number Binding**: Extracted statutory clauses (e.g., "Section 178 of the Companies Act") and misattributed `178` as a numeric currency value with unit `rs`.
+   - **Header Dissociation**: Multi-tier table headers with `<br>` tags were carried raw into fact attributes (e.g., `"Sunil Kumar Bansal — **% of pre-**<br>**Offer**..."`).
+   - **Orphan Column Indexing**: In unaligned markdown tables, columns defaulted to generic labels (`"Col2"`, `"Col5"`) leaving `temporal_period: null`.
+
+2. **System Handling & Recovery**:
+   - The arbitration engine filters out facts with `temporal_period: null` from candidate pairing, preventing corrupted nodes from generating false contradiction edges.
+   - For high-confidence arbitration, the pipeline falls back to LLM-structured JSON extraction with Pydantic type validation, ensuring attributes represent genuine financial/economic entities rather than regulatory sections.
 
 ---
 
