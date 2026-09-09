@@ -114,8 +114,8 @@ export default function DocsPage() {
               fact extraction, context envelope formulation, immutable ledger storage, and cross-document epistemic arbitration.
             </p>
 
-            <div className="rounded-xl border border-hairline bg-surface-card/50 p-3 sm:p-5 overflow-hidden shadow-xs">
-              <div className="overflow-x-auto rounded-lg bg-canvas border border-hairline/60 p-2 sm:p-4 flex items-center justify-center">
+            <div className="overflow-hidden shadow-xs">
+              <div className="overflow-x-auto flex items-center justify-center">
                 <a
                   href="/arch.png"
                   target="_blank"
@@ -128,7 +128,7 @@ export default function DocsPage() {
                     alt="FLAE End-to-End System Architecture Diagram"
                     width={8422}
                     height={1226}
-                    className="w-full h-auto object-contain min-w-[720px] select-none"
+                    className="w-full h-auto object-contain min-w-180 select-none"
                     priority
                   />
                 </a>
@@ -190,10 +190,10 @@ export default function DocsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-5 rounded-xl border border-hairline bg-surface-card space-y-2">
-                <Badge variant="teal" className="text-[10px] font-mono uppercase">
+                <span className="text-[10px] font-mono uppercase text-green-700">
                   CORROBORATED
-                </Badge>
-                <h3 className="font-semibold text-sm text-ink">Identical Assertions</h3>
+                </span>
+                <h3 className="font-semibold text-sm text-ink pt-2">Identical Assertions</h3>
                 <p className="text-xs text-muted-claude leading-relaxed">
                   Both filings assert mathematically and semantically compatible claims under the same
                   context envelope. Example: identical express parcel volume numbers across the annual
@@ -202,10 +202,10 @@ export default function DocsPage() {
               </div>
 
               <div className="p-5 rounded-xl border border-hairline bg-surface-card space-y-2">
-                <Badge variant="destructive" className="text-[10px] font-mono uppercase">
+                <span className="text-[10px] font-mono uppercase text-red-700">
                   CONTRADICTED
-                </Badge>
-                <h3 className="font-semibold text-sm text-ink">Genuine Conflict</h3>
+                </span>
+                <h3 className="font-semibold text-sm text-ink pt-2">Genuine Conflict</h3>
                 <p className="text-xs text-muted-claude leading-relaxed">
                   Claims disagree under matching context envelopes without a valid statutory reconciliation.
                   Example: conflicting board of director counts or irreconcilable capital expenditure figures.
@@ -213,10 +213,10 @@ export default function DocsPage() {
               </div>
 
               <div className="p-5 rounded-xl border border-hairline bg-surface-card space-y-2">
-                <Badge variant="amber" className="text-[10px] font-mono uppercase">
+                <span className="text-[10px] font-mono uppercase text-amber-700">
                   RECONCILED
-                </Badge>
-                <h3 className="font-semibold text-sm text-ink">Divergence Factor Identified</h3>
+                </span>
+                <h3 className="font-semibold text-sm text-ink pt-2">Divergence Factor Identified</h3>
                 <p className="text-xs text-muted-claude leading-relaxed">
                   Apparent numeric differences are fully explained by divergence in organizational scope
                   (Standalone ₹74,540 M vs Consolidated ₹81,415 M) or temporal granularity (FY vs Q4).
@@ -228,7 +228,7 @@ export default function DocsPage() {
           {/* Section 4: Enterprise Audit Guarantee */}
           <div className="p-8 rounded-xl bg-coral text-white space-y-4">
             <h2 className="text-2xl sm:text-3xl font-serif font-semibold">
-              100% Verbatim Auditability Guarantee
+              Verbatim Auditability Guarantee
             </h2>
             <p className="text-xs sm:text-sm text-white/90 max-w-3xl leading-relaxed">
               Every atomic fact stored in FLAE requires an exact verbatim quotation, document
