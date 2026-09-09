@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -83,13 +85,68 @@ export default function DocsPage() {
             </div>
           </div>
 
-          {/* Section 2: Code Window / Payload Mockup (Dark Navy Surface per design doc) */}
+          {/* Section 2: End-to-End System Architecture */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-coral" />
+                <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-ink">
+                  2. System Architecture
+                </h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="pill" className="text-[10px] font-mono">
+                  Full Pipeline
+                </Badge>
+                <a
+                  href="/arch.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-coral hover:text-coral-dark font-medium underline underline-offset-4 decoration-coral/40 hover:decoration-coral transition-colors"
+                >
+                  <span>Open Full Resolution</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+            <p className="text-sm text-body max-w-3xl leading-relaxed">
+              Complete architectural flow mapping the multi-document ingestion pipeline, coordinate-anchored
+              fact extraction, context envelope formulation, immutable ledger storage, and cross-document epistemic arbitration.
+            </p>
+
+            <div className="rounded-xl border border-hairline bg-surface-card/50 p-3 sm:p-5 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto rounded-lg bg-canvas border border-hairline/60 p-2 sm:p-4 flex items-center justify-center">
+                <a
+                  href="/arch.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full cursor-zoom-in"
+                  title="Click to view full resolution"
+                >
+                  <Image
+                    src="/arch.png"
+                    alt="FLAE End-to-End System Architecture Diagram"
+                    width={8422}
+                    height={1226}
+                    className="w-full h-auto object-contain min-w-[720px] select-none"
+                    priority
+                  />
+                </a>
+              </div>
+              <div className="mt-2.5 flex items-center justify-between text-[11px] text-muted-claude px-1 font-mono">
+                <span>Figure 1: End-to-End Ingestion, Extraction, Context Anchoring & Arbitration Workflow</span>
+                <span className="hidden sm:inline">Click image to open full resolution</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Code Window / Payload Mockup (Dark Navy Surface per design doc) */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-coral" />
                 <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-ink">
-                  2. 6-Dimensional Context Envelope Specification
+                  3. 6-Dimensional Context Envelope Specification
                 </h2>
               </div>
               <Badge variant="pill" className="text-[10px] font-mono">
@@ -122,12 +179,12 @@ export default function DocsPage() {
             </Card>
           </div>
 
-          {/* Section 3: Arbitration Classification Matrix */}
+          {/* Section 4: Arbitration Classification Matrix */}
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-coral" />
               <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-ink">
-                3. Arbitration Decision Matrix
+                4. Arbitration Decision Matrix
               </h2>
             </div>
 

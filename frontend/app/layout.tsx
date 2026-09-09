@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   title: "FLAE - Fact Ledger & Arbitration Engine",
   description:
     "FLAE: Deterministic Atomic Fact Ledger and Cross-Document Arbitration Engine resolving discrepancies across corporate reports, financial dossiers, and filings.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
