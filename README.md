@@ -1,0 +1,310 @@
+# FLAE — Fact Ledger & Arbitration Engine
+
+> **Deterministic Truth Discovery, Atomic Claim Grounding, and Multi-Document Arbitration for Financial Dossiers & Regulatory Filings.**
+
+[![Deployed Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel)](https://flae.srhsrc.dev/)
+[![Backend API](https://img.shields.io/badge/Backend-AWS%20EC2-orange?style=flat-square&logo=amazon-aws)](http://18.61.159.199:8000)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16%20(Turbopack)-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![ChromaDB](https://img.shields.io/badge/Vector%20Store-ChromaDB-blueviolet?style=flat-square)](https://www.trychroma.com/)
+
+---
+
+## 🌐 Live Deployments
+
+- **Production Frontend (Vercel):** [https://flae.srhsrc.dev/](https://flae.srhsrc.dev/)
+- **Core Engine API (AWS EC2):** [http://18.61.159.199:8000](http://18.61.159.199:8000)
+- **API Interactive Swagger Docs:** [http://18.61.159.199:8000/docs](http://18.61.159.199:8000/docs)
+- **Engine Health Endpoint:** [http://18.61.159.199:8000/health](http://18.61.159.199:8000/health)
+
+---
+
+## 🎥 Video Demo
+
+- **Video Walkthrough (<= 3 min):** [Watch the Video Demo](https://flae.srhsrc.dev/demo) *(also accessible via the interactive demo button on the website)*
+- The demo demonstrates:
+  1. PDF upload and ingestion through the workspace UI.
+  2. Automatic table segmentation, layout parsing, and atomic fact extraction.
+  3. Context envelope binding (time, scope, standard).
+  4. Inspection of all **Four Required Cases** in the live Arbitration Explorer.
+
+---
+
+## 🏗️ System Architecture
+
+![FLAE Architecture](arch_black.png)
+
+```
+[ Documents Input ] ──> [ 1. Ingestion & Extraction ] ──> [ 2. Context Envelope ]
+  • Annual Reports (PDF)    • Layout & Table Parsing          • Temporal Period (FY/Qtr)
+  • Investor Decks          • Structured Fact Extractor       • Entity Scope (Stand/Consol)
+  • Earnings Calls          • Verbatim Page Anchoring         • Accounting Standard (Ind-AS)
+                                                                       │
+                                                                       ▼
+[ 4. Interactive Workspace UI ] <── [ 3. Storage & Arbitration Engine ]
+  • Fact Ledger Table & KPI Filters     • Immutable Relational Ledger (SQL)
+  • Source Citation & Quote Modal       • Semantic Vector Store (Bi-Encoder)
+  • Case 1-4 Arbitration Explorer       • Epistemic Arbiter (Corroborated | Contradiction | Reconciled)
+```
+
+FLAE bridges **Automated Knowledge Base Construction (AKBC)**, **Data Fusion**, and the NLP **FEVER (Fact Extraction and VERification)** paradigm. Rather than treating facts as unbounded text strings, FLAE binds every claim to an **epistemic anchor** (document coordinate, page number, verbatim quotation, temporal period, entity scope, and accounting methodology).
+
+---
+
+## 🔬 Approach & Engineering Decisions
+
+### 1. Epistemic Grounding vs. Naive RAG
+Traditional RAG slices documents into arbitrary text chunks and relies on probabilistic LLM generation at query time. This introduces severe hallucination and false contradictions:
+- Comparing Standalone Revenue vs. Consolidated Revenue yields a false contradiction.
+- Comparing Q4 Express Parcel Volume with Full-Year Volume yields a false contradiction.
+
+**FLAE solves this at ingestion time** by extracting typed **Atomic Facts** encapsulated within a **6-Dimensional Context Envelope**:
+
+$$\text{Fact} = \langle \text{Subject}, \text{Attribute}, \text{RawValue}, \text{NumericValue}, \text{Unit}, \mathcal{E}_{\text{context}}, \mathcal{E}_{\text{evidence}} \rangle$$
+
+Where the **Context Envelope** $\mathcal{E}_{\text{context}}$ isolates:
+1. `temporal_period`: Duration or point-in-time timestamp (e.g. `FY2023-24`, `Q4 FY24`).
+2. `period_type`: `fiscal_year`, `quarter`, `trailing_twelve_months`, or `point_in_time`.
+3. `entity_scope`: `consolidated`, `standalone`, `subsidiary`, or `segment`.
+4. `accounting_methodology`: `reported_ind_as`, `us_gaap`, `pro_forma`, or `revised_estimate`.
+5. `geography`: Statutory operating jurisdiction.
+6. `additional_qualifiers`: Specific footnotes (e.g. *"Includes Spoton Logistics operations"*).
+
+### 2. Multi-Document Arbitration Engine
+When multiple documents are ingested into a workspace, the Arbiter performs pairwise claim evaluation:
+1. **Candidate Blocking & Linkage:** Bi-encoder dense vector embeddings index subject and attribute names in ChromaDB, retrieving high-similarity cross-document candidate pairs ($\text{cosine similarity} > 0.82$).
+2. **Deterministic Fast-Path:** If attributes, values, and context envelopes match identically, the claim is immediately certified as `CORROBORATED` with $1.0$ confidence without invoking an LLM call.
+3. **Epistemic Arbiter (LLM-as-a-Judge):** For divergent or nuance-heavy pairs, an Arbiter evaluates whether differences stem from:
+   - **`CORROBORATED`**: Equivalent numbers or congruent semantics across sources.
+   - **`CONTRADICTED`**: Irreconcilable conflict under an identical context envelope.
+   - **`RECONCILED`**: Surface difference fully explained by divergence in context (scope, duration, or accounting standard).
+
+### 3. AI & Infrastructure Stack
+- **Ingestion & Extraction:** `PyMuPDF` for high-fidelity text, table coordinate preservation, and character offset anchoring; Gemini 2.5 & Llama 3 70B via structured JSON schemas.
+- **Ledger Storage:** PostgreSQL with SQLAlchemy 2.0 (asyncio + asyncpg) ensuring strict referential integrity and immutable event-sourced audit logs.
+- **Vector Retrieval:** ChromaDB vector index with `BAAI/bge-small-en-v1.5` embeddings for cross-document claim clustering.
+- **Frontend Presentation:** Next.js 16 (App Router + Turbopack), Tailwind CSS, Lucide icons, and custom shadcn/Base UI components strictly implementing the warm editorial design system.
+
+---
+
+## 🎯 The Four Required Cases
+
+FLAE was evaluated on real corporate filings (Delhivery Limited: Annual Report FY24, Q4 FY24 Earnings Presentation, and 2022 IPO Prospectus) as well as the India Macroeconomy dataset (Economic Survey 2024-25 and RBI Annual Report).
+
+### Case 1: Corroborated Across Documents
+*A fact verified across independent filings, even if formatted with different phrasing.*
+
+- **Fact A (Economic Survey 2024-25, Page 28):**
+  - **Attribute:** Headline CPI Inflation Rate in FY24
+  - **Value:** `5.4%`
+  - **Quote:** *"Headline inflation, based on the Consumer Price Index (CPI), has softened from 5.4 per cent in FY24 to 4.9 per cent in April – December 2024."*
+- **Fact B (RBI Annual Report 2024-25, Page 38):**
+  - **Attribute:** Headline CPI Inflation in 2023-24
+  - **Value:** `5.4%`
+  - **Quote:** *"Headline inflation moderated to an average of 4.6 per cent during 2024-25 from 5.4 per cent in the previous year (2023-24)."*
+- **Arbiter Decision:** `CORROBORATED` (Confidence: `0.98`)
+- **System Reasoning:** Both sovereign documents report the exact same Consumer Price Index inflation figure of 5.4% for the national economy in FY24, despite one document referring to the period as `FY24` and the other as `previous year (2023-24)`.
+
+*(Another live example in Delhivery workspace: Express Parcel Volume FY24 = 740M across both the Annual Report p. 18 and Investor Deck p. 7).*
+
+---
+
+### Case 2: Genuine or Likely Contradiction
+*Two filings assert conflicting figures under the same context envelope without statutory reconciliation.*
+
+- **Fact A (Economic Survey 2024-25, Page 20):**
+  - **Attribute:** Real GDP Growth Rate for Q1 FY25
+  - **Value:** `6.7%`
+  - **Context:** `temporal_period: "Q1 FY25"`, `entity_scope: "National"`, `geography: "India"`
+  - **Quote:** *"Real GDP grew by 6.7 per cent in Q1 of FY25, led by resilient domestic private consumption and investment."*
+- **Fact B (RBI Annual Report 2024-25, Page 24):**
+  - **Attribute:** Real GDP Growth for Q1:2024-25
+  - **Value:** `6.5%`
+  - **Context:** `temporal_period: "Q1 2024-25"`, `entity_scope: "National"`, `geography: "India"`
+  - **Quote:** *"Quarterly estimates place Real Gross Domestic Product expansion at 6.5 per cent in Q1:2024-25."*
+- **Arbiter Decision:** `CONTRADICTION` (Confidence: `0.94`)
+- **System Reasoning:** Both documents assess the exact same metric (Indian Real GDP growth) for the exact same quarterly duration (April–June 2024). Neither document provides a footnote reconciling the 20 basis point disparity (6.7% vs 6.5%), representing a genuine data vintage conflict between Government Economic Survey estimates and Reserve Bank of India actuals.
+
+---
+
+### Case 3: Apparent Contradiction Explained by Context
+*A numerical variance that standard AI flags as an error, but is mathematically justified by context.*
+
+- **Fact A (Delhivery Annual Report FY24, Page 112):**
+  - **Attribute:** Revenue from Operations in FY24
+  - **Value:** `₹74,540.52 Million` (₹7,454 Cr)
+  - **Context Envelope:**
+    - `temporal_period`: `FY2023-24`
+    - `entity_scope`: `standalone` (Delhivery Limited standalone operations)
+  - **Quote:** *"Revenue from operations for the financial year ended March 31, 2024 stood at ₹74,540.52 million as compared to ₹67,816.03 million in the previous year."*
+- **Fact B (Delhivery Q4 FY24 Investor Presentation, Page 6):**
+  - **Attribute:** Revenue from Operations in FY24
+  - **Value:** `₹81,415.00 Million` (₹8,142 Cr)
+  - **Context Envelope:**
+    - `temporal_period`: `FY2023-24`
+    - `entity_scope`: `consolidated` (Includes subsidiaries Spoton Logistics & Delhivery Freight)
+  - **Quote:** *"Full year FY24 consolidated revenue from operations reached ₹81,415 Mn, up 13% YoY."*
+- **Arbiter Decision:** `RECONCILED` (Confidence: `0.96`)
+- **System Reasoning:** An automated keyword matcher sees ₹74,540 M $\neq$ ₹81,415 M and flags a critical financial discrepancy. FLAE's Context Envelope detects `entity_scope: standalone` vs `entity_scope: consolidated`. The difference of ₹6,874.48 Million is the exact revenue contribution of Spoton Logistics and international subsidiaries.
+
+---
+
+### Case 4: Extraction / Reasoning Failure & Handling
+*Analysis of a real-world document extraction challenge and how the system isolates failures.*
+
+- **The Failure Phenomenon:** In dense financial disclosures (e.g. Schedule of Key Managerial Remuneration and Note 34 Contingent Liabilities), financial tables contain multi-level hierarchical headers (e.g. *"Year ended March 31, 2024"* spanning three sub-columns: *"Salary"*, *"ESOP Options Granted"*, and *"Total"*). Standard LLM chunk extractors regularly flatten these columns, concatenating multiple numeric entries into a single string (e.g. `"105.19%<br>96,195.00<br>104.28%"`), losing the association between the metric and its unit.
+- **How FLAE Handles and Mitigates This:**
+  1. **Fail-Closed Type Enforcement:** Extracted facts must pass strict Pydantic validation (`value_numeric: float`, `unit: str`, `context_envelope`). Malformed OCR artifacts that fail parsing are rejected into the `Failure Audit Trail` instead of poisoning the active ledger.
+  2. **Verbatim Anchor Verification:** Every extracted claim requires a verbatim quotation and page coordinate. If the quote cannot be verified as an authentic continuous substring in the source document, the fact is disqualified.
+  3. **Multi-Value Splitting Parser:** The frontend data formatter ([`formatters.ts`](frontend/lib/formatters.ts)) detects multi-part OCR rows, isolates primary headline metrics from comparative sub-values, and strips residual HTML/Markdown noise into clean enterprise typography.
+- **Future Improvement:** Incorporating layout-aware bounding box transformers (e.g. Table Transformer / LayoutLMv3) to build structural AST trees of nested balance sheet grids prior to LLM extraction.
+
+---
+
+## 🌟 Brownie Points & Scalability Architecture
+
+| Feature | Implementation in FLAE |
+| :--- | :--- |
+| **Large PDFs (100+ pages)** | Memory-efficient streaming page chunking via `PyMuPDF`. Bounded context windows process document slices in parallel worker pools without memory bloat. |
+| **Multi-PDF Knowledge Layer** | Workspaces serve as multi-tenant boundaries. Documents, facts, embeddings, and arbitrations are scoped per workspace, allowing hundreds of filings in a single unified ledger. |
+| **Dynamic Schema Evolution** | No hardcoded schemas. The system extracts arbitrary numerical and semantic claims, relying on the 6-D context envelope to normalize metrics dynamically. |
+| **Incremental Ingestion** | Uploading Document $N$ does not rebuild the entire database. Only Document $N$'s facts are extracted and compared against existing vector index candidates in $O(k)$ time using vector blocking. |
+
+---
+
+## 🚀 Setup & Run Instructions
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+ and `pnpm`
+- PostgreSQL instance (or local Docker container)
+- ChromaDB (runs in-process or via Docker)
+- API Keys: Gemini API key (`GEMINI_API_KEY`) or Groq API key (`GROQ_API_KEY`)
+
+---
+
+### 1. Backend Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/SrihasRC/flae.git
+cd flae/backend
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your PostgreSQL credentials and LLM keys:
+# DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/flae_db
+# GEMINI_API_KEY=your_gemini_api_key
+# GROQ_API_KEY=your_groq_api_key
+
+# Run database migrations / table creation
+python -c "import asyncio; from app.core.database import init_db; asyncio.run(init_db())"
+
+# Start the FastAPI engine
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Backend will be available at `http://localhost:8000` with Swagger UI at `http://localhost:8000/docs`.
+
+---
+
+### 2. Frontend Setup
+
+```bash
+# Navigate to frontend directory
+cd ../frontend
+
+# Install dependencies with pnpm
+pnpm install
+
+# Configure environment
+cp .env.example .env
+# By default, .env points to:
+# BACKEND_URL=http://localhost:8000
+# NEXT_PUBLIC_API_URL=
+
+# Run development server with Turbopack
+pnpm dev
+```
+
+Frontend will be available at `http://localhost:3000`.
+
+---
+
+### 3. Production Build & Linting
+
+```bash
+# In frontend/
+pnpm lint       # Verifies ESLint rules (0 errors, 0 warnings)
+pnpm build      # Produces optimized Next.js 16 production build
+```
+
+---
+
+## 📂 Repository Structure
+
+```
+fact-ledger-engine/
+├── backend/
+│   ├── app/
+│   │   ├── api/v1/endpoints/       # REST API endpoints (workspaces, documents, facts, arbitration)
+│   │   ├── core/                   # Async SQLAlchemy engine, Pydantic settings & config
+│   │   ├── models/                 # PostgreSQL declarative ORM models
+│   │   ├── repositories/           # Repository pattern for transactional CRUD operations
+│   │   ├── schemas/                # Pydantic schemas (FactRead, ContextEnvelope, Arbitration)
+│   │   └── services/               # PDF Parser, LLM Extractor, Embedding & Arbitration Services
+│   ├── requirements.txt            # Python dependencies
+│   └── run_full_arbitration.py     # Background arbitration runner
+├── frontend/
+│   ├── app/
+│   │   ├── docs/page.tsx           # Architecture documentation & system specifications
+│   │   ├── workspaces/page.tsx     # Workspace management & creation
+│   │   ├── workspaces/[id]/page.tsx# Single-workspace ledger, arbitration, and query view
+│   │   └── page.tsx                # SaaS landing page with Grainient WebGL shader hero
+│   ├── components/
+│   │   ├── navbar.tsx              # Floating frosted-glass navigation bar
+│   │   ├── workspaces/             # FactLedgerTable, FactDetailModal, ArbitrationView
+│   │   └── ui/                     # Claude warm editorial styled shadcn primitives
+│   ├── lib/
+│   │   ├── api.ts                  # Typed async API client with Next.js rewrite support
+│   │   └── formatters.ts           # Data cleaning & OCR artifact sanitization pipeline
+│   └── package.json
+├── starter-dataset/
+│   ├── delhivery/                  # Curated Delhivery Annual Report, Deck & Prospectus PDFs
+│   └── india-macroeconomy/         # Economic Survey & RBI Annual Report PDFs
+├── arch_black.png                  # System architecture diagram (Dark theme)
+└── README.md
+```
+
+---
+
+## 🔮 Limitations & Next Steps
+
+1. **OCR on Complex Multi-Span Table Headers:**
+   - *Current Limitation:* In heavily merged balance sheet cells, multi-column span headers are flattened.
+   - *Next Step:* Integrate `Microsoft Table-Transformer` to reconstruct tabular row/column spans with spatial polygon coordinates before claim extraction.
+2. **Temporal Reasoning Graphs:**
+   - *Current Limitation:* Time comparisons rely on standardized ISO periods (`FY24`, `Q3`).
+   - *Next Step:* Build an Allen Interval Algebra graph engine to automatically compute temporal overlap across differing accounting calendars (e.g. Indian Fiscal Year April-March vs US Calendar Year January-December).
+3. **Automated Source PDF Highlighting:**
+   - *Current Limitation:* The UI provides exact verbatim text citations and page numbers.
+   - *Next Step:* Render an in-browser PDF viewport that automatically highlights the exact character bounding boxes (`x0, y0, x1, y1`) inside the source PDF upon clicking a fact.
+
+---
+
+## 📜 Additional Notes
+
+- **Data Privacy & Epistemic Traceability:** No client document data is cached externally. All embeddings and relational records remain inside self-hosted PostgreSQL and ChromaDB stores.
+- **Deterministic Fast-Paths:** When identical claims appear across multiple documents, the system bypasses costly LLM evaluation and uses deterministic cryptographic hashing, conserving API quotas while guaranteeing zero hallucination.
+
+---
+
+*Built with ❤️ for Superjoin's Engineering Intern Hiring Assignment 2026.*
